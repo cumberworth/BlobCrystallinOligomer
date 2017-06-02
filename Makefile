@@ -7,10 +7,13 @@ BUILDDIR = build
 PREFIX = ../../
 TARGET = blobCrystallinOligomer
 TARGETDIR = bin
-SRCDIR = src
+SRCDIR = src/BlobCrystallinOligomer
 INCLUDEDIR = include
-EXTERNALHEADERS = -Iinclude -I/usr/include/eigen3
+EXTERNALHEADERS =
 EXTERNALLIBS = -lboost_program_options -lboost_mpi -lboost_serialization
+# For compiling on Dexter (using local Boost installation (I think that's why this is needed))
+# add -I/home/amc226/include to $(EXTERNALHEADERS)
+# add -L/home/amc226/lib to $(EXTERNALLIBS)
 
 vpath %.h $(INCLUDEDIR)/
 vpath %.cpp $(SRCDIR)/
@@ -22,10 +25,6 @@ OBJECTS := $(subst $(SRCDIR),$(BUILDDIR),$(OBJECTS))
 CPP = mpicxx
 CPPFLAGS = -I$(INCLUDEDIR) $(EXTERNALHEADERS) $(OPTLEVEL)
 LDFLAGS = $(EXTERNALLIBS) $(OPTLEVEL)
-
-# For compiling on Dexter (using local Boost installation (I think that's why this is needed))
-#CPPFLAGS = -I/home/amc226/include $(EXTERNALHEADERS) $(OPTLEVEL)
-#LDFLAGS = -L/home/amc226/lib $(EXTERNALLIBS) $(OPTLEVEL)
 
 DEPDIR = .d
 $(shell mkdir -p $(DEPDIR) >/dev/null)
