@@ -28,29 +28,12 @@ def main():
 
     # Calculate ACD-NTD angle
     ntd_length = 2*args.num_ntd_spheres * ntd_radius
-    #min_angle = math.pi/2 - math.acos(-1/3)
     min_angle = 0
     max_angle = math.pi - math.acos(-1/3) # This only allows ntds that bulge, unlike in Jehle model
-    #min_angle = 0 # This doesn't allow very extended ntds
-    #max_angle = 3*math.pi/2 - math.acos(-1/3)
-    constants = (tet_arm_length, hexamer_edge_length, ntd_length, acd_radius)
-
-    # First guess for angle with derived result (which unfortunately is a wrong
-    # relation, but at least gets it close (upper bound)
-    try:
-        angle_guess = opt.brentq(derived_acd_ntd_constraint, min_angle, max_angle,
-                args=constants)
-        #acd_ntd_angle = calc_acd_ntd_angle(*constants)
-    except ValueError:
-        print('No solutions in domain')
-        sys.exit()
-
-    # Refine guess iteratively
     constants = (acd_radius, ntd_radius, args.num_acd_spheres,
             args.num_ntd_spheres, tet_arm_length)
     acd_ntd_angle = opt.brentq(construct_acd_ntd_constraint, min_angle,
             max_angle, args=constants)
-#    acd_ntd_angle = angle_guess
 
     # Build oligomer and write to file
     monomers = construct_oligomer(acd_ntd_angle, acd_radius, ntd_radius,
@@ -61,26 +44,6 @@ def main():
     # Simple tetrahedral with same arm length (for aligning in VMD)
     #tetrahedral = construct_tetrahedral(tet_arm_length)
     #write_pdb(tetrahedral, args.output_filebase + '_centers.pdb')
-
-
-def derived_acd_ntd_constraint(t, a, l, g, r):
-    """Constraint function of ACD-NTD angle, must equal 0.
-
-    t: theta
-    a: arm length
-    l: triangle edge length
-    g: NTD length
-    r: ACD radius
-
-    See notebook for derivation.
-    """
-    Z = math.sin(t + math.acos(-1/3) - math.pi/2)
-    Y = a * math.tan(math.pi - math.acos(-1/3))
-    X = l/math.sqrt(3) - math.sqrt(3)*r
-    M = math.sin(math.acos(-1/3) - math.pi/2)
-    N = math.sin(3*math.pi/2 - t - math.acos(-1/3))
-    res = Z*((Y - X)*M/N - g) - math.sqrt(3)*r
-    return res
 
 
 def construct_acd_ntd_constraint(acd_ntd_angle, acd_radius, ntd_radius,
@@ -102,21 +65,6 @@ def construct_acd_ntd_constraint(acd_ntd_angle, acd_radius, ntd_radius,
     res = dist - 2*ntd_radius
 
     return res
-
-
-def acd_ntd_solution(a, l, g, r):
-    """Solution of constraint function of ACD-NTD angle.
-
-    a: arm length
-    l: triangle edge length
-    g: NTD length
-    r: ACD radius
-
-    Sympy's attempt, but just doesn't work
-    """
-    f1 = math.acos(-6*math.sqrt(3)*a + math.sqrt(3)*l + 6*math.sqrt(3)*5 / (9*g))
-    f2 = math.acos(-1/3)
-    return f1 - f2
 
 
 def construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
