@@ -42,8 +42,9 @@ def main():
     pdb_file.write(monomers)
 
     # Simple tetrahedral with same arm length (for aligning in VMD)
-    #tetrahedral = construct_tetrahedral(tet_arm_length)
-    #write_pdb(tetrahedral, args.output_filebase + '_centers.pdb')
+    tetrahedral = construct_tetrahedral(tet_arm_length)
+    pdb_file = model.PDBConfigOutputFile(args.output_filebase + '_centers.pdb')
+    pdb_file.write(tetrahedral)
 
 
 def construct_acd_ntd_constraint(acd_ntd_angle, acd_radius, ntd_radius,
@@ -217,32 +218,33 @@ def construct_hexamer(dimer1, dimer2, dimer3):
     return (dimer1, dimer2, dimer3)
 
 
-#def construct_tetrahedral(arm_length):
-#    """Construct tetrahedral with atoms at center of hexamers"""
-#
-#    arm = np.array([0, 0, -arm_length])
-#    axisx = np.array([1, 0, 0])
-#    translate_down_y = trans.affines.compose(arm, np.eye(3), np.ones(3))
-#    angleTet = math.acos(-1/3.)
-#    rotate_tet_x = trans.axangles.axangle2aff(axisx, angleTet)
-#    angle60 = math.pi/3
-#    axisz = np.array([0, 0, 1])
-#    rotate_60_z = trans.axangles.axangle2aff(axisz, angle60)
-#    angle120 = 2*math.pi/3
-#    rotate_120_z = trans.axangles.axangle2aff(axisz, angle120)
-#
-#    trans_1 = translate_down_y
-#    trans_2 = rotate_60_z.dot(rotate_tet_x).dot(trans_1)
-#    trans_3 = rotate_120_z.dot(trans_2)
-#    trans_4 = rotate_120_z.dot(trans_3)
-#    trans_mons = [trans_1, trans_2, trans_3, trans_4]
-#    monomers = []
-#    for trans_mon, i in zip(trans_mons, range(4)):
-#        monomer = Monomer(1, 0, 1, 0, 0, i, i)
-#        monomer.apply_transformation(trans_mon)
-#        monomers.append(monomer)
-#
-#    return monomers
+def construct_tetrahedral(arm_length):
+    """Construct tetrahedral with atoms at center of hexamers"""
+
+    arm = np.array([0, 0, -arm_length])
+    axisx = np.array([1, 0, 0])
+    translate_down_y = trans.affines.compose(arm, np.eye(3), np.ones(3))
+    angleTet = math.acos(-1/3.)
+    rotate_tet_x = trans.axangles.axangle2aff(axisx, angleTet)
+    angle60 = math.pi/3
+    axisz = np.array([0, 0, 1])
+    rotate_60_z = trans.axangles.axangle2aff(axisz, angle60)
+    angle120 = 2*math.pi/3
+    rotate_120_z = trans.axangles.axangle2aff(axisz, angle120)
+
+    trans_1 = translate_down_y
+    trans_2 = rotate_60_z.dot(rotate_tet_x).dot(trans_1)
+    trans_3 = rotate_120_z.dot(trans_2)
+    trans_4 = rotate_120_z.dot(trans_3)
+    trans_mons = [trans_1, trans_2, trans_3, trans_4]
+    monomers = []
+    for trans_mon, i in zip(trans_mons, range(4)):
+        particle = model.SimpleParticle(i, 'TET')
+        monomer = model.Monomer([particle], [], 1, 1, i)
+        monomer.apply_transformation(trans_mon)
+        monomers.append(monomer)
+
+    return monomers
 
 
 def construct_tetrahedral_hexamers(hexamers, arm_length):

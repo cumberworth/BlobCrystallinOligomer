@@ -215,6 +215,8 @@ class PDBConfigOutputFile:
                     radius = monomer.acd_radius
                 elif particle.domain == 'NTD':
                     radius = monomer.ntd_radius
+                else:
+                    radius = 1
 
                 atom_fields = {
                         'serial': particle.index,
