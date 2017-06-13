@@ -12,9 +12,12 @@ namespace shared_types {
     typedef double eneT;
 
     enum class CoorSet {
-        current;
+        current,
         trial
     };
+
+    // Exception structs
+    struct InputError {};
 
 }
 

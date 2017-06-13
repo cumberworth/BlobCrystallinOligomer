@@ -1,6 +1,6 @@
 // movetype.cpp
 
-#include "movetype.h"
+#include "BlobCrystallinOligomer/movetype.h"
 
 namespace movetype {
 

@@ -3,13 +3,14 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-#include "BlobCrystallinOligomer/space.h"
+#include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/config.h"
 #include "BlobCrystallinOligomer/energy.h"
 
 namespace simulation {
 
-    using params::InputParams;
+    using param::InputParams;
+    using config::Config;
     using energy::Energy;
 
     class MCSimulation {
@@ -18,12 +19,11 @@ namespace simulation {
 
     };
 
-    template<typename configT>
-    class NTVMCSimulation {
+    class NVTMCSimulation {
         public:
-            NTVMCSimulation(
-                    configT& config,
-                    Energy<configT>& energy,
+            NVTMCSimulation(
+                    Config& config,
+                    Energy& energy,
                     InputParams params);
             void run();
     };

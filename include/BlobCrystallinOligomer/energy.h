@@ -3,40 +3,58 @@
 #ifndef ENERGY_H
 #define ENERGY_H
 
-#include "BlobCrystallinOligomer/shared_types.h"
-#include "BlobCrystallinOligomer/params.h"
-#include "BlobCrystallinOligomer/particle.h"
-#include "BlobCrystallinOligomer/monomer.h"
+#include <vector>
+
 #include "BlobCrystallinOligomer/config.h"
+#include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/monomer.h"
+#include "BlobCrystallinOligomer/param.h"
+#include "BlobCrystallinOligomer/particle.h"
+#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace energy {
 
-    using shared_types::eneT;
-    using shared_types::CoorSet;
-    using params::InputParams;
-    using particle::Particle;
-    using monomer::Monomer;
     using config::Config;
+    using file::InteractionData;
+    using file::PotentialData;
+    using monomer::Monomer;
+    using param::InputParams;
+    using particle::Particle;
+    using shared_types::CoorSet;
+    using shared_types::eneT;
+    using std::vector;
 
-    template<typename configT>
     class Energy {
         public:
-            Energy(configT& config, InputParams params);
-            Energy(InputParams params);
+            Energy(Config& conf, InputParams params);
+
             eneT calc_monomer_pair_energy(
                     Monomer& monomer1,
                     CoorSet coorset1,
                     Monomer& monomer2,
                     CoorSet coorset2);
-            eneT calc_sphere_pair_energy(
+            /*  Calculate pair energy between two monomers.*/
+
+            bool monomers_interacting(
+                    Monomer& monomer1,
+                    CoorSet coorset1,
+                    Monomer& monomer2,
+                    CoorSet coorset2);
+            /* Check if monomers within range to have non-zero pair potential */
+
+            eneT calc_particle_pair_energy(
                     Particle& particle1,
                     CoorSet coorset1,
                     Particle& particle2,
                     CoorSet coorset2);
+            /*  Calculate pair energy between two particles.*/
 
         private:
-            configT& m_config;
+            Config& m_config;
             // map of particle type pairs to potentials
+
+            void create_potentials(vector<PotentialData> potentials,
+                    vector<InteractionData> interactions);
     };
 }
 

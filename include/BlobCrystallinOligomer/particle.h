@@ -8,14 +8,15 @@
 namespace particle {
 
     using shared_types::vecT;
+    using shared_types::CoorSet;
 
     class Particle {
         public:
-            Particle();
+            Particle(int index, int type, vecT pos);
             virtual ~Particle();
             int get_index();
             int get_type();
-            vecT get_pos();
+            vecT get_pos(CoorSet coorset);
 
             void translate();
             // Translate particle by given vector
@@ -31,6 +32,7 @@ namespace particle {
 
     class PatchyParticle: public Particle {
         public:
+            PatchyParticle(int index, int type, vecT pos, vecT patch_norm);
             vecT get_patch_norm();
 
         private:
@@ -40,6 +42,8 @@ namespace particle {
 
     class OrientedPatchyParticle: public PatchyParticle {
         public:
+            OrientedPatchyParticle(int index, int type, vecT pos,
+                    vecT patch_norm, vecT patch_orient);
             vecT get_patch_orient();
 
         private:

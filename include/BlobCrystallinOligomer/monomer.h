@@ -22,7 +22,7 @@ namespace monomer {
 
     class Monomer {
         public:
-            Monomer();
+            Monomer(int index, particleArrayT particles);
             void translate(vecT disV);
             // Translate monomer by given vector
 

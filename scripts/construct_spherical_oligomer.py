@@ -40,6 +40,8 @@ def main():
             args.num_acd_spheres, args.num_ntd_spheres, tet_arm_length)
     pdb_file = model.PDBConfigOutputFile(args.output_filebase + '.pdb')
     pdb_file.write(monomers)
+    json_file = model.JSONConfigOutputFile(args.output_filebase + '.json')
+    json_file.write(monomers)
 
     # Simple tetrahedral with same arm length (for aligning in VMD)
     tetrahedral = construct_tetrahedral(tet_arm_length)
@@ -61,7 +63,7 @@ def construct_acd_ntd_constraint(acd_ntd_angle, acd_radius, ntd_radius,
 
     # Select two particles that should be touching at the NTD-NTD nexus
     particle1 = monomers[0].ntd_particles[-1]
-    particle2 = monomers[22].ntd_particles[-1]
+    particle2 = monomers[23].ntd_particles[-1]
     dist = np.linalg.norm(particle2.pos - particle1.pos)
     res = dist - 2*ntd_radius
 
@@ -85,20 +87,22 @@ def construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
 
             # Note patch orientation is tied to the way the particles are later
             # oriented
-            if j > 0:
+            if j == 0:
                 particle = model.OrientedPatchyParticle(particle_i, 'ACD',
-                        patch_norm=[0, -1, 0, 1], patch_orient=[1, 0, 0, 1])
+                        patch_norm=np.array([0., -1., 0.]),
+                        patch_orient=np.array([1., 0., 0.]))
             else:
-                particle = model.SimpleParticle(particle_i, 'ACD')
+                particle = model.PatchyParticle(particle_i, 'ACD',
+                        patch_norm=np.array([-1., 0., 0.]))
 
             particle_i += 1
             acd_particles.append(particle)
 
         ntd_particles = []
         for j in range(num_ntd_spheres):
-            if j < num_ntd_spheres - 1:
+            if j == 0:
                 particle = model.PatchyParticle(particle_i, 'NTD',
-                        patch_norm=[1, 0, 0, 1])
+                        patch_norm=[-1., 0., 0.])
             else:
                 particle = model.SimpleParticle(particle_i, 'NTD')
 
@@ -131,6 +135,12 @@ def orient_monomer(monomer, acd_ntd_angle):
     acd_z_rotation = trans.axangles.axangle2aff(z_axis, z_axis_angle,
             last_acd_pos)
 
+    # Rotate last ACD for initial patch placement
+    back_z_axis_angle = math.pi/6
+    acd_z_rotation = trans.axangles.axangle2aff(z_axis, z_axis_angle,
+            last_acd_pos)
+    monomer.acd_particles[1].apply_transformation(acd_z_rotation)
+
     # Make the next axis
     z_rotation = trans.axangles.axangle2aff(z_axis, z_axis_angle)
     ntd_xy_axis = np.dot(z_rotation, np.array([1, 0, 0, 1]))[:3]
@@ -147,6 +157,21 @@ def orient_monomer(monomer, acd_ntd_angle):
         particle.apply_transformation(ntd_transform)
         p_i += 1
 
+    # Prepare patches
+    #z_axis_angle = -math.pi/2
+    #y_axis = np.array([0, 1, 0])
+    #x_comp = monomer.ntd_particles[0].pos[0]
+    #z_comp = monomer.ntd_particles[0].pos[2]
+    #xz_proj = np.array([x_comp, 0, z_comp])
+    #xz_proj_norm = np.linalg.norm(xz_proj)
+    #y_axis_angle = -math.acos(np.dot(z_axis, xz_proj)/xz_proj_norm)
+    #for particle in monomer:
+    #    pos = particle.pos
+    #    z_rotation = trans.axangles.axangle2aff(z_axis, z_axis_angle, pos)
+    #    y_rotation = trans.axangles.axangle2aff(y_axis, y_axis_angle, pos)
+    #    particle.apply_transformation(z_rotation)
+    #    particle.apply_transformation(y_rotation)
+
     return monomer
 
 
@@ -157,8 +182,24 @@ def construct_dimer(monomer1, monomer2):
     Assumes they are currently in the same position and the ACDs in the xy
     plane.
     """
-    refT = refls.rfnorm2aff([0, 1, 0])
-    monomer2.apply_transformation(refT)
+    z_axis = np.array([0, 0, 1])
+    z_axis_angle = math.pi
+    z_rotation = trans.axangles.axangle2aff(z_axis, z_axis_angle)
+
+    # Need to rotate around y-axis to get spheres in place
+    # Get angle by taking dot product of z axis and zx plane projection of the
+    # ntd position, dividing by the zx plane projection norm, and taking the
+    # inverse cos of the result
+    y_axis = np.array([0, 1, 0])
+    x_comp = monomer1.ntd_particles[0].pos[0]
+    z_comp = monomer1.ntd_particles[0].pos[2]
+    xz_proj = np.array([x_comp, 0, z_comp])
+    xz_proj_norm = np.linalg.norm(xz_proj)
+    y_axis_angle = 2*math.acos(np.dot(z_axis, xz_proj)/xz_proj_norm)
+    y_rotation = trans.axangles.axangle2aff(y_axis, y_axis_angle)
+
+    rotation = np.dot(y_rotation, z_rotation)
+    monomer2.apply_transformation(rotation)
 
     return (monomer1, monomer2)
 
@@ -171,11 +212,13 @@ def construct_hexamer(dimer1, dimer2, dimer3):
     y axis in the xy plane.
     """
 
-    # Flip 2 and 3 on y
-    refT = refls.rfnorm2aff([1, 0, 0])
+    # Rotate 2 and 3 pi around z
+    z_axis = np.array([0, 0, 1])
+    z_axis_angle = math.pi
+    z_rotation = trans.axangles.axangle2aff(z_axis, z_axis_angle)
     for dimer in [dimer2, dimer3]:
         for monomer in dimer:
-            monomer.apply_transformation(refT)
+            monomer.apply_transformation(z_rotation)
 
     # First rotate all dimers to be 30 degrees off y axis
     axis = np.array([0, 0, 1])
@@ -207,7 +250,7 @@ def construct_hexamer(dimer1, dimer2, dimer3):
     coor_center = 0
     for dimer in [dimer1, dimer2, dimer3]:
         for monomer in dimer:
-            coor_center += monomer.center
+            coor_center += monomer.acd_center
 
     coor_center /= 6
     af = trans.affines.compose(-coor_center[:3], np.eye(3), np.ones(3))

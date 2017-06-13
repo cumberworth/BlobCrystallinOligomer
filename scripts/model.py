@@ -10,6 +10,7 @@ which is probably more work.
 
 import json
 import string
+import transforms3d.affines as affines
 
 import numpy as np
 
@@ -31,7 +32,9 @@ class Monomer:
         self._num_particles = len(acd_particles) + len(ntd_particles)
 
         self._cur_i = -1 # For iterating over contained particles
-        self._num_particles = len(ntd_particles) + len(acd_particles)
+        self._num_acd_particles = len(acd_particles)
+        self._num_ntd_particles = len(ntd_particles)
+        self._num_particles = self._num_acd_particles + self._num_ntd_particles
 
     # Following two functions are iterator protocol to allow iteration over
     # particles
@@ -66,6 +69,16 @@ class Monomer:
     def ntd_particles(self):
         return self._ntd_particles
     
+    @property
+    def acd_center(self):
+        center = np.zeros(4)
+        for particle in self.acd_particles:
+            center += particle.pos
+
+        center /= self._num_acd_particles
+
+        return center
+
     @property
     def center(self):
         center = np.zeros(4)
@@ -124,7 +137,7 @@ class PatchyParticle(SimpleParticle):
     def __init__(self, *args, patch_norm=None, **kwargs):
         super().__init__(*args, **kwargs)
         if patch_norm is None: # Unit vector normal to patch
-            self._patch_norm = np.array([0, 0, 0, 1.])
+            self._patch_norm = np.array([0., 0., 0.])
         else:
             self._patch_norm = patch_norm
 
@@ -138,7 +151,8 @@ class PatchyParticle(SimpleParticle):
         """Apply the transformation matrix to all position vectors."""
 
         super().apply_transformation(M)
-        self._patch_norm = np.dot(M, self._patch_norm)
+        translation, rotation, z, s = affines.decompose(M)
+        self._patch_norm = np.dot(rotation, self._patch_norm)
 
 
 class OrientedPatchyParticle(PatchyParticle):
@@ -147,7 +161,7 @@ class OrientedPatchyParticle(PatchyParticle):
     def __init__(self, *args, patch_orient=None, **kwargs):
         super().__init__(*args, **kwargs)
         if patch_orient is None: # Unit vector perpindicular to patch norm
-            self._patch_orient = np.array([0, 0, 0, 1.])
+            self._patch_orient = np.array([0., 0., 0.])
         else:
             self._patch_orient = patch_orient
 
@@ -161,7 +175,8 @@ class OrientedPatchyParticle(PatchyParticle):
         """Apply the transformation matrix to all position vectors."""
 
         super().apply_transformation(M)
-        self._patch_orient = np.dot(M, self._patch_orient)
+        translation, rotation, z, s = affines.decompose(M)
+        self._patch_orient = np.dot(rotation, self._patch_orient)
 
 
 class PDBConfigOutputFile:
@@ -233,6 +248,38 @@ class PDBConfigOutputFile:
                 }
                 line = self._atom_template.format(**atom_fields)
                 output_file.write(line + '\n')
+                if type(particle) in [PatchyParticle, OrientedPatchyParticle]:
+                    atom_fields = {
+                            'serial': particle.index,
+                            'name': 'PAT',
+                            'resName': 'ABC',
+                            'chainID': string.ascii_uppercase[monomer.index],
+                            'resSeq': monomer.index,
+                            'x': particle.pos[0] + particle.patch_norm[0],
+                            'y': particle.pos[1] + particle.patch_norm[1],
+                            'z': particle.pos[2] + particle.patch_norm[2],
+                            'occupancy': 1,
+                            #'tempFactor': '',
+                            'element': 'CG'
+                    }
+                    line = self._atom_template.format(**atom_fields)
+                    output_file.write(line + '\n')
+                if type(particle) is OrientedPatchyParticle:
+                    atom_fields = {
+                            'serial': particle.index,
+                            'name': 'PAT',
+                            'resName': 'ABC',
+                            'chainID': string.ascii_uppercase[monomer.index],
+                            'resSeq': monomer.index,
+                            'x': particle.pos[0] + particle.patch_orient[0],
+                            'y': particle.pos[1] + particle.patch_orient[1],
+                            'z': particle.pos[2] + particle.patch_orient[2],
+                            'occupancy': 1,
+                            #'tempFactor': '',
+                            'element': 'CG'
+                    }
+                    line = self._atom_template.format(**atom_fields)
+                    output_file.write(line + '\n')
 
         ter_fields = {
                 'serial': particle.index + 1,
@@ -272,7 +319,7 @@ class JSONConfigOutputFile:
 
                 monomer_json['particles'].append(particle_json)
 
-            cgmonomer_json['config'].append(monomer_json)
+            cgmonomer_json['cgmonomer']['config'].append(monomer_json)
 
         json.dump(cgmonomer_json, open(self._filename, 'w'), indent=4,
                     separators=(',', ': '))
