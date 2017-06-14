@@ -24,7 +24,8 @@ namespace file {
     struct ParticleData {
         int index;
         string domain;
-        string type;
+        string form;
+        int type;
         vecT pos;
         vecT patch_norm;
         vecT patch_orient;
@@ -50,20 +51,20 @@ namespace file {
     };
 
     struct PotentialData {
-        string type;
+        string form;
         int index;
         double sigh;
         double sigl;
         double siga1;
         double siga2;
-        double sigt1;
-        double sigt2;
+        double sigt;
         double eps;
+        double rcut;
     };
 
     struct InteractionData {
         vector<pair<int, int>> particle_pairs;
-        int potential_label;
+        int potential_index;
     };
 
     class InputEnergyFile {

@@ -15,6 +15,7 @@ namespace space {
             CuboidPBC(); // Need to take box size as args
 
             distT calc_dist(vecT pos1, vecT pos2);
+            vecT calc_diff(vecT pos1, vecT pos2);
     };
 }
 

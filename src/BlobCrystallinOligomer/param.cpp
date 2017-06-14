@@ -26,9 +26,12 @@ namespace param {
         // Parameter file options
         po::options_description inp_options {"System input"};
         inp_options.add_options()
-            ("topology_filename",
+            ("config_filename",
                 po::value<string>(&m_config_filename)->default_value(""),
                 "File for system topology")
+            ("energy_filename",
+                po::value<string>(&m_energy_filename)->default_value(""),
+                "File for system energy")
         ;
 
         // Displayed options

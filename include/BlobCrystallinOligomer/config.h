@@ -3,14 +3,15 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <memory>
 #include <vector>
 
-#include "BlobCrystallinOligomer/shared_types.h"
-#include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/file.h"
-#include "BlobCrystallinOligomer/space.h"
-#include "BlobCrystallinOligomer/particle.h"
 #include "BlobCrystallinOligomer/monomer.h"
+#include "BlobCrystallinOligomer/param.h"
+#include "BlobCrystallinOligomer/particle.h"
+#include "BlobCrystallinOligomer/shared_types.h"
+#include "BlobCrystallinOligomer/space.h"
 
 namespace config {
 
@@ -22,25 +23,29 @@ namespace config {
     using particle::Particle;
     using shared_types::distT;
     using shared_types::CoorSet;
+    using shared_types::vecT;
     using space::CuboidPBC;
-    using std::vector;
     using std::reference_wrapper;
+    using std::unique_ptr;
+    using std::vector;
 
     typedef vector<reference_wrapper<Monomer>> monomerArrayT;
 
     class Config {
         public:
             Config(InputParams params);
-            void extract_config_from_monomers(vector<MonomerData>);
-            /*  From standard config transfer format.
-                Must be called to create
-                the internal config data structure.
-            */
 
             Monomer& get_monomer(int monomer_index);
+            
+            monomerArrayT get_monomers();
 
-            // Consider replacing with calc_dist and calc_trial dist, as will
-            // only care about current case or the one particle trial case
+            vecT calc_interparticle_vector(
+                    Particle& particle1,
+                    CoorSet coorset1,
+                    Particle& particle2,
+                    CoorSet coorset2);
+            /*  Calculate vector from particle 1 to particle 2 */
+
             distT calc_dist(
                     Particle& particle1,
                     CoorSet coorset1,
@@ -49,9 +54,11 @@ namespace config {
             /*  Calculate distance between two particles */
 
         private:
-            monomerArrayT m_monomers {};
+            vector<unique_ptr<Monomer>> m_monomers;
+            monomerArrayT m_monomer_refs;
             CuboidPBC m_space;
 
+            void create_monomers(vector<MonomerData>);
     };
 }
 

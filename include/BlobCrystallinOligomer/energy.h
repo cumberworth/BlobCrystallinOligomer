@@ -3,13 +3,18 @@
 #ifndef ENERGY_H
 #define ENERGY_H
 
+#include <memory>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "BlobCrystallinOligomer/config.h"
 #include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/hash.h"
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/particle.h"
+#include "BlobCrystallinOligomer/potential.h"
 #include "BlobCrystallinOligomer/shared_types.h"
 
 namespace energy {
@@ -20,8 +25,13 @@ namespace energy {
     using monomer::Monomer;
     using param::InputParams;
     using particle::Particle;
+    using potential::PairPotential;
     using shared_types::CoorSet;
     using shared_types::eneT;
+    using std::pair;
+    using std::reference_wrapper;
+    using std::unique_ptr;
+    using std::unordered_map;
     using std::vector;
 
     class Energy {
@@ -40,7 +50,14 @@ namespace energy {
                     CoorSet coorset1,
                     Monomer& monomer2,
                     CoorSet coorset2);
-            /* Check if monomers within range to have non-zero pair potential */
+            /*  Check if monomers within range to have non-zero pair potential */
+
+            bool particles_interacting(
+                    Particle& particle1,
+                    CoorSet coorset1,
+                    Particle& particle2,
+                    CoorSet coorset2);
+            /*  Check if particles within range to have non-zero pair potential */
 
             eneT calc_particle_pair_energy(
                     Particle& particle1,
@@ -51,7 +68,8 @@ namespace energy {
 
         private:
             Config& m_config;
-            // map of particle type pairs to potentials
+            vector<unique_ptr<PairPotential>> m_potentials;
+            unordered_map<pair<int, int>, reference_wrapper<PairPotential>> m_pair_to_pot;
 
             void create_potentials(vector<PotentialData> potentials,
                     vector<InteractionData> interactions);
