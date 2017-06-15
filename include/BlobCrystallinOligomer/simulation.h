@@ -6,16 +6,21 @@
 #include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/config.h"
 #include "BlobCrystallinOligomer/energy.h"
+#include "BlobCrystallinOligomer/random_gens.h"
 
 namespace simulation {
 
     using param::InputParams;
     using config::Config;
     using energy::Energy;
+    using random_gens::RandomGens;
 
     class MCSimulation {
         public:
             virtual void run() = 0;
+
+        private:
+            RandomGens m_random_num;
 
     };
 
@@ -24,7 +29,8 @@ namespace simulation {
             NVTMCSimulation(
                     Config& config,
                     Energy& energy,
-                    InputParams params);
+                    InputParams params,
+                    RandomGens& random_num);
             void run();
     };
 }

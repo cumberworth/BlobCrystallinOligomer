@@ -42,6 +42,7 @@ namespace potential {
 
         private:
             double m_eps; // Well depth
+            double m_four_eps; // Well depth premultiplied by 4
             double m_sigl; // Zero point
             double m_rcut; // Cutoff
             double m_shift; // Shift

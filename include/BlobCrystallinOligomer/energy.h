@@ -20,6 +20,7 @@
 namespace energy {
 
     using config::Config;
+    using config::monomerArrayT;
     using file::InteractionData;
     using file::PotentialData;
     using monomer::Monomer;
@@ -51,6 +52,10 @@ namespace energy {
                     Monomer& monomer2,
                     CoorSet coorset2);
             /*  Check if monomers within range to have non-zero pair potential */
+
+            monomerArrayT get_interacting_monomers(Monomer& monomer1,
+                    CoorSet coorset1);
+            /*  Create list of monomers interacting with given */
 
             bool particles_interacting(
                     Particle& particle1,

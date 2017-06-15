@@ -10,6 +10,7 @@
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/particle.h"
+#include "BlobCrystallinOligomer/random_gens.h"
 #include "BlobCrystallinOligomer/shared_types.h"
 #include "BlobCrystallinOligomer/space.h"
 
@@ -21,6 +22,7 @@ namespace config {
     using monomer::Monomer;
     using param::InputParams;
     using particle::Particle;
+    using random_gens::RandomGens;
     using shared_types::distT;
     using shared_types::CoorSet;
     using shared_types::vecT;
@@ -33,9 +35,12 @@ namespace config {
 
     class Config {
         public:
-            Config(InputParams params);
+            Config(InputParams params, RandomGens& random_num);
 
             Monomer& get_monomer(int monomer_index);
+
+            Monomer& get_random_monomer();
+            /*  Draw monomer with uniform probability */
             
             monomerArrayT get_monomers();
 
@@ -56,7 +61,9 @@ namespace config {
         private:
             vector<unique_ptr<Monomer>> m_monomers;
             monomerArrayT m_monomer_refs;
-            CuboidPBC m_space;
+            unique_ptr<CuboidPBC> m_space_store;
+            CuboidPBC& m_space;
+            RandomGens& m_random_num;
 
             void create_monomers(vector<MonomerData>);
     };

@@ -6,10 +6,12 @@
 #include "Json/json.hpp"
 
 #include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace file {
 
     using nlohmann::json;
+    using shared_types::distT;
     using std::ifstream;
     using std::string;
 
@@ -23,7 +25,12 @@ namespace file {
         return m_monomers;
     }
 
+    distT InputConfigFile::get_box_len() {
+        return m_box_len;
+    }
+
     void InputConfigFile::parse_json() {
+        m_box_len = m_config_json["cgmonomer"]["box_len"];
         for (auto json_monomer: m_config_json["cgmonomer"]["config"]) {
             int monomer_index {json_monomer["index"]};
             vector<ParticleData> particles {};

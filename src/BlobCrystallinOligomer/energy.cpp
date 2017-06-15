@@ -12,6 +12,7 @@
 namespace energy {
 
     using config::Config;
+    using config::monomerArrayT;
     using file::InputEnergyFile;
     using file::InteractionData;
     using file::PotentialData;
@@ -86,6 +87,22 @@ namespace energy {
         bool interacting {pot.particles_interacting(dist)};
 
         return interacting;
+    }
+
+    monomerArrayT Energy::get_interacting_monomers(Monomer& monomer1,
+            CoorSet coorset1) {
+        monomerArrayT monomers {m_config.get_monomers()};
+        CoorSet coorset2 {CoorSet::current};
+        for (Monomer& monomer2: monomers) {
+            if (monomer1.get_index() == monomer2.get_index()) {
+                continue;
+            }
+            if (monomers_interacting(monomer1, coorset1, monomer2, coorset2)) {
+                monomers.push_back(monomer2);
+            }
+        }
+
+        return monomers;
     }
 
     eneT Energy::calc_particle_pair_energy(Particle& particle1, CoorSet coorset1,

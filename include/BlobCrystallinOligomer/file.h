@@ -14,6 +14,7 @@
 namespace file {
 
     using shared_types::vecT;
+    using shared_types::distT;
     using std::pair;
     using std::unordered_map;
     using std::string;
@@ -41,10 +42,12 @@ namespace file {
         public:
             InputConfigFile(string filename);
             vector<MonomerData> get_monomers();
+            distT get_box_len();
 
         private:
             json m_config_json;
             vector<MonomerData> m_monomers;
+            distT m_box_len;
 
             void parse_json();
 

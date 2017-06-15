@@ -44,15 +44,18 @@ namespace potential {
 
     ShiftedLJPotential::ShiftedLJPotential(double eps, double sigl,
             double rcut):
-            PairPotential {rcut}, m_eps {eps}, m_sigl {sigl}, m_rcut {rcut} {
+            PairPotential {rcut}, m_eps {eps}, m_four_eps {4*eps},
+            m_sigl {sigl}, m_rcut {rcut} {
 
-        //m_shift = 
+        distT sig_r_ratio {m_sigl/rcut};
+        m_shift = m_four_eps*pow(sig_r_ratio, 12) - pow(sig_r_ratio, 6);
     }
 
     eneT ShiftedLJPotential::calc_energy(distT rdist, vecT, Orientation,
             Orientation) {
-        eneT ene {0};
-        //? * pow(?/rdist, 12) - pow(?/rdist, 6) - shift
+        distT sig_r_ratio {m_sigl/rdist};
+        eneT ene;
+        ene = m_four_eps*pow(sig_r_ratio, 12) - pow(sig_r_ratio, 6) - m_shift;
 
         return ene;
     }
