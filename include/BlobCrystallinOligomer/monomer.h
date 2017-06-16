@@ -16,6 +16,7 @@ namespace monomer {
     using file::MonomerData;
     using file::ParticleData;
     using particle::Particle;
+    using shared_types::rotMatT;
     using shared_types::vecT;
     using space::CuboidPBC;
     using std::vector;
@@ -37,11 +38,14 @@ namespace monomer {
             particleArrayT get_particles();
             /*  Get all particles */
 
+            vecT get_center();
+            /* Get geometric center of all particles */
+
             // Configuration manipulation
             void translate(vecT disv);
             /*  Translate monomer by given vector */
 
-            void rotate();
+            void rotate(vecT rot_c, rotMatT rot_mat);
             /*  Rotate monomer by given ? around given origin */
 
             void trial_to_current();

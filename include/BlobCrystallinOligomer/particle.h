@@ -8,6 +8,7 @@
 
 namespace particle {
 
+    using shared_types::rotMatT;
     using shared_types::vecT;
     using shared_types::CoorSet;
     using space::CuboidPBC;
@@ -31,7 +32,7 @@ namespace particle {
             void translate(vecT disv);
             /*  Translate particle by given vector and store as trial*/
 
-            virtual void rotate();
+            virtual void rotate(vecT rot_c, rotMatT rot_mat);
             /*  Rotate particle by given around given origin and store as trial*/
 
             void trial_to_current();
@@ -53,14 +54,14 @@ namespace particle {
         public:
             PatchyParticle(int index, int type, vecT pos, Orientation ore,
                     CuboidPBC& pbc_space);
-            virtual void rotate();
+            virtual void rotate(vecT rot_c, rotMatT rot_mat);
     };
 
     class OrientedPatchyParticle: public PatchyParticle {
         public:
             OrientedPatchyParticle(int index, int type, vecT pos,
                     Orientation ore, CuboidPBC& pbc_space);
-            void rotate();
+            void rotate(vecT rot_c, rotMatT rot_mat);
     };
 }
 

@@ -47,6 +47,12 @@ namespace particle {
         m_trial_pos = new_pos;
     }
 
+    void Particle::rotate(vecT rot_c, rotMatT rot_mat) {
+        translate(-rot_c);
+        m_pos = rot_mat * m_pos;
+        translate(rot_c);
+    }
+
     void Particle::trial_to_current() {
         m_pos = m_trial_pos;
         m_ore = m_trial_ore;
@@ -57,9 +63,18 @@ namespace particle {
             Particle {index, type, pos, ore, pbc_space} {
     }
 
+    void PatchyParticle::rotate(vecT rot_c, rotMatT rot_mat) {
+        Particle::rotate(rot_c, rot_mat);
+        m_ore.patch_norm = rot_mat * m_ore.patch_norm;
+    }
+
     OrientedPatchyParticle::OrientedPatchyParticle(int index, int type,
             vecT pos, Orientation ore, CuboidPBC& pbc_space):
             PatchyParticle {index, type, pos, ore, pbc_space} {
     }
 
+    void OrientedPatchyParticle::rotate(vecT rot_c, rotMatT rot_mat) {
+        PatchyParticle::rotate(rot_c, rot_mat);
+        m_ore.patch_orient = rot_mat * m_ore.patch_orient;
+    }
 }

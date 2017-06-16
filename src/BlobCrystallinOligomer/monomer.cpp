@@ -18,6 +18,8 @@ namespace monomer {
     using particle::Particle;
     using particle::PatchyParticle;
     using space::CuboidPBC;
+    using shared_types::CoorSet;
+    using shared_types::rotMatT;
     using std::cout;
     using std::unique_ptr;
     using std::vector;
@@ -40,6 +42,37 @@ namespace monomer {
     particleArrayT Monomer::get_particles() {
 
         return m_particle_refs;
+    }
+
+    vecT Monomer::get_center() {
+        vecT center {0, 0, 0};
+        for (Particle& particle: m_particle_refs) {
+            center += particle.get_pos(CoorSet::current);
+        }
+        center /= m_particles.size();
+
+        return center;
+    }
+
+    void Monomer::translate(vecT disv) {
+        for (size_t i {0}; i != m_particles.size(); i++) {
+            Particle& particle {m_particle_refs[i].get()};
+            particle.translate(disv);
+        }
+    }
+
+    void Monomer::rotate(vecT rot_c, rotMatT rot_mat) {
+        for (size_t i {0}; i != m_particles.size(); i++) {
+            Particle& particle {m_particle_refs[i].get()};
+            particle.rotate(rot_c, rot_mat);
+        }
+    }
+
+    void Monomer::trial_to_current() {
+        for (size_t i {0}; i != m_particles.size(); i++) {
+            Particle& particle {m_particle_refs[i].get()};
+            particle.trial_to_current();
+        }
     }
 
     void Monomer::create_particles(vector<ParticleData> p_datas,
@@ -68,27 +101,6 @@ namespace monomer {
                 throw shared_types::InputError {};
             }
             m_particles.emplace_back(part);
-        }
-    }
-
-    void Monomer::translate(vecT disv) {
-        for (size_t i {0}; i != m_particles.size(); i++) {
-            Particle& particle {m_particle_refs[i].get()};
-            particle.translate(disv);
-        }
-    }
-
-    void Monomer::rotate(?) {
-        for (size_t i {0}; i != m_particles.size(); i++) {
-            Particle& particle {m_particle_refs[i].get()};
-            particle.rotate(?);
-        }
-    }
-
-    void Monomer::trial_to_current() {
-        for (size_t i {0}; i != m_particles.size(); i++) {
-            Particle& particle {m_particle_refs[i].get()};
-            particle.trial_to_current();
         }
     }
 }

@@ -4,15 +4,22 @@
 #include <cmath>
 #include <vector>
 
+#include "Eigen/Geometry"
+
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/movetype.h"
+#include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/shared_types.h"
 
 namespace movetype {
 
     using config::monomerArrayT;
+    using Eigen::AngleAxis;
     using monomer::Monomer;
+    using param::InputParams;
     using shared_types::eneT;
+    using shared_types::distT;
+    using shared_types::vecT;
     using shared_types::CoorSet;
     using std::exp;
     using std::fmin;
@@ -20,15 +27,37 @@ namespace movetype {
     using std::vector;
     using std::find;
 
+    vecT random_unit_vector(RandomGens& random_num) {
+        /*  Taken from Daan's book, which is taken from Allen and Tildesley */
+        distT ransq {2};
+        distT ran1;
+        distT ran2;
+        while (ransq >= 1) {
+            ran1 = 1 - 2*random_num.uniform_real();
+            ran2 = 1 - 2*random_num.uniform_real();
+            ransq = ran1*ran1 + ran2*ran2;
+        }
+        distT ranh {2*sqrt(1 - ransq)};
+        distT x {ran1*ranh};
+        distT y {ran2*ranh};
+        distT z {1 - 2*ransq};
+
+        return {x, y, z};
+    }
+
+	distT random_displacement(distT max_disp, RandomGens& random_num) {
+        return max_disp * (random_num.uniform_real() - 0.5);
+    }
+
     MCMovetype::MCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
-            eneT beta):
+            InputParams params):
             m_config {conf}, m_energy {ene}, m_random_num {random_num},
-            m_beta {beta} {
+            m_beta {1/params.m_temp} {
     }
 
     bool VMMCMovetype::move() {
         Monomer& monomer_seed {m_config.get_random_monomer()};
-        generate_movemap();
+        generate_movemap(monomer_seed);
         apply_movemap(monomer_seed);
         add_interacting_pairs(monomer_seed);
         while (m_pair_mis.size() != 0) {
@@ -166,15 +195,40 @@ namespace movetype {
         m_pair_mis.clear();
     }
 
-    void TranslationVMMCMovetype::generate_movemap() {
+    TranslationVMMCMovetype::TranslationVMMCMovetype(Config& conf, Energy& ene,
+            RandomGens& random_num, InputParams params):
+            VMMCMovetype {conf, ene, random_num, params},
+                     m_max_disp_tc {params.m_max_disp_tc} {
+    }
+
+    void TranslationVMMCMovetype::generate_movemap(Monomer&) {
+        for (size_t i {0}; i != 3; i++) {
+            m_disp_v[i] = random_displacement(m_max_disp_tc, m_random_num);
+        }
     }
 
     void TranslationVMMCMovetype::apply_movemap(Monomer& monomer) {
+        monomer.translate(m_disp_v);
     }
 
-    void RotationVMMCMovetype::generate_movemap() {
+    RotationVMMCMovetype::RotationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
+            InputParams params):
+            VMMCMovetype {conf, ene, random_num, params},
+                     m_max_disp_rc {params.m_max_disp_rc},
+                     m_max_disp_a {params.m_max_disp_a} {
+    }
+
+    void RotationVMMCMovetype::generate_movemap(Monomer& seed_monomer) {
+        vecT rand_v {random_unit_vector(m_random_num)};
+        distT scalar {random_displacement(m_max_disp_rc, m_random_num)};
+        m_rot_c = seed_monomer.get_center() + scalar*rand_v;
+        vecT axis {random_unit_vector(m_random_num)};
+        distT theta {random_displacement(m_max_disp_a, m_random_num)};
+        AngleAxis<distT> angle_axis {theta, axis};
+        m_rot_mat = angle_axis.toRotationMatrix();
     }
 
     void RotationVMMCMovetype::apply_movemap(Monomer& monomer) {
+        monomer.rotate(m_rot_c, m_rot_mat);
     }
 }

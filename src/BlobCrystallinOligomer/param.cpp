@@ -7,11 +7,14 @@
 #include "boost/program_options.hpp"
 
 #include "BlobCrystallinOligomer/param.h"
+#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace param {
 
     namespace po = boost::program_options;
 
+    using shared_types::eneT;
+    using shared_types::distT;
     using std::string;
     using std::cout;
 
@@ -32,11 +35,26 @@ namespace param {
             ("energy_filename",
                 po::value<string>(&m_energy_filename)->default_value(""),
                 "File for system energy")
+            ("temp",
+                po::value<eneT>(&m_temp)->default_value(300),
+                "Maximum dispacement for translations")
+        ;
+        po::options_description move_options {"Movetype options"};
+        move_options.add_options()
+            ("max_disp_tc",
+                po::value<distT>(&m_max_disp_tc)->default_value(1),
+                "Maximum dispacement for translations")
+            ("max_disp_rc",
+                po::value<distT>(&m_max_disp_rc)->default_value(1),
+                "Maximum displacement for selecting center of rotation")
+            ("max_disp_a",
+                po::value<distT>(&m_max_disp_a)->default_value(1),
+                "Maximum displacement for selecting rotation angle")
         ;
 
         // Displayed options
         po::options_description displayed_options {"Allowed options"};
-        displayed_options.add(cl_options).add(inp_options);
+        displayed_options.add(cl_options).add(inp_options).add(move_options);
 
         // Parse command line input
         po::variables_map vm;

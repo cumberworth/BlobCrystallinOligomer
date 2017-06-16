@@ -8,6 +8,7 @@
 namespace shared_types {
 
     typedef Eigen::Vector3d vecT;
+    typedef Eigen::Matrix3d rotMatT;
     typedef double distT;
     typedef double eneT;
 

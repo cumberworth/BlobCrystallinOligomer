@@ -3,6 +3,7 @@
 #ifndef MOVETYPE_H
 #define MOVETYPE_H
 
+#include <cmath>
 #include <set>
 #include <utility>
 #include <vector>
@@ -11,6 +12,7 @@
 #include "BlobCrystallinOligomer/energy.h"
 #include "BlobCrystallinOligomer/hash.h"
 #include "BlobCrystallinOligomer/monomer.h"
+#include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/random_gens.h"
 
 namespace movetype {
@@ -19,17 +21,25 @@ namespace movetype {
     using config::Monomer;
     using config::monomerArrayT;
     using energy::Energy;
+    using param::InputParams;
     using random_gens::RandomGens;
     using shared_types::eneT;
+    using shared_types::distT;
+    using shared_types::rotMatT;
+    using shared_types::vecT;
     using std::pair;
     using std::set;
+    using std::sqrt;
     using std::vector;
+
+    vecT random_unit_vector(RandomGens& random_num);
+    distT random_displacement(distT max_disp, RandomGens& random_num);
 
     class MCMovetype {
         // MC movetype interface
         public:
             MCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
-                    eneT m_beta);
+                    InputParams params);
             virtual bool move() = 0;
 
         protected:
@@ -51,7 +61,7 @@ namespace movetype {
             set<int> m_interacting_mis;
             set<pair<int, int>> m_pair_mis;
 
-            void virtual generate_movemap() = 0;
+            void virtual generate_movemap(Monomer& seed_monomer) = 0;
             void virtual apply_movemap(Monomer& monomer) = 0;
 
             void add_interacting_pairs(Monomer& monomer1);
@@ -65,18 +75,29 @@ namespace movetype {
 
     class TranslationVMMCMovetype: public VMMCMovetype {
         public:
-            using VMMCMovetype::VMMCMovetype;
+            TranslationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
+                    InputParams params);
         private:
-            void generate_movemap();
+            void generate_movemap(Monomer&);
             void apply_movemap(Monomer& monomer);
+
+            distT m_max_disp_tc;
+            vecT m_disp_v;
     };
 
     class RotationVMMCMovetype: public VMMCMovetype {
         public:
-            using VMMCMovetype::VMMCMovetype;
+            RotationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
+                    InputParams params);
         private:
-            void generate_movemap();
+            void generate_movemap(Monomer& seed_monomer);
             void apply_movemap(Monomer& monomer);
+
+            distT m_max_disp_rc;
+            distT m_max_disp_a;
+            vecT m_rot_c; // Centre of rotation
+            rotMatT m_rot_mat; // Rotation matrix
+            
     };
 }
 
