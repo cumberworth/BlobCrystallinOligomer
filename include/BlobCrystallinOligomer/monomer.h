@@ -6,15 +6,15 @@
 #include <memory>
 #include <vector>
 
-#include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/ifile.h"
 #include "BlobCrystallinOligomer/particle.h"
 #include "BlobCrystallinOligomer/shared_types.h"
 #include "BlobCrystallinOligomer/space.h"
 
 namespace monomer {
 
-    using file::MonomerData;
-    using file::ParticleData;
+    using ifile::MonomerData;
+    using ifile::ParticleData;
     using particle::Particle;
     using shared_types::rotMatT;
     using shared_types::vecT;
@@ -38,6 +38,8 @@ namespace monomer {
             particleArrayT get_particles();
             /*  Get all particles */
 
+            int get_num_particles();
+
             vecT get_center();
             /* Get geometric center of all particles */
 
@@ -55,6 +57,7 @@ namespace monomer {
             int m_index; // Unique monomer index
             vector<unique_ptr<Particle>> m_particles;
             particleArrayT m_particle_refs;
+            int m_num_particles;
 
             void create_particles(vector<ParticleData> p_datas,
                     CuboidPBC& pbc_space);

@@ -12,6 +12,10 @@ namespace space {
 
     CuboidPBC::CuboidPBC(distT len): m_r {len/2}  {}
 
+    void CuboidPBC::set_len(distT len) {
+        m_r = len/2;
+    }
+
     distT CuboidPBC::calc_dist(vecT pos1, vecT pos2) {
         vecT diff {calc_diff(pos1, pos2)};
 

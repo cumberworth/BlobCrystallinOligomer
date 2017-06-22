@@ -5,16 +5,16 @@
 #include <utility>
 
 #include "BlobCrystallinOligomer/config.h"
-#include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/ifile.h"
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/random_gens.h"
 #include "BlobCrystallinOligomer/shared_types.h"
 
 namespace config {
 
-    using file::InputConfigFile;
-    using file::MonomerData;
-    using file::ParticleData;
+    using ifile::InputConfigFile;
+    using ifile::MonomerData;
+    using ifile::ParticleData;
     using monomer::Monomer;
     using particle::Particle;
     using random_gens::RandomGens;
@@ -22,6 +22,7 @@ namespace config {
     using std::cout;
     using std::pair;
     using std::unique_ptr;
+    using std::make_unique;
 
     Config::Config(InputParams params, RandomGens& random_num):
             m_space_store {new CuboidPBC()}, m_space {*m_space_store},
@@ -30,11 +31,13 @@ namespace config {
         InputConfigFile config_file {params.m_config_filename};
         vector<MonomerData> monomers {config_file.get_monomers()};
         create_monomers(monomers);
+        m_box_len = config_file.get_box_len();
         m_space.set_len(config_file.get_box_len());
+        m_radius = config_file.get_radius();
 
         // Create monomer reference array
         for (auto &m: m_monomers) {
-            m_monomer_refs.emplace_back(m);
+            m_monomer_refs.emplace_back(*m);
         }
     }
 
@@ -49,6 +52,23 @@ namespace config {
 
     monomerArrayT Config::get_monomers() {
         return m_monomer_refs;
+    }
+
+    int Config::get_num_particles() {
+        int num_parts {0};
+        for (Monomer& mono: m_monomer_refs) {
+            num_parts += mono.get_num_particles();
+        }
+
+        return num_parts;
+    }
+
+    distT Config::get_box_len() {
+        return m_box_len;
+    }
+
+    distT Config::get_radius() {
+        return m_radius;
     }
 
     vecT Config::calc_interparticle_vector(Particle& particle1, CoorSet coorset1,
@@ -71,7 +91,7 @@ namespace config {
 
     void Config::create_monomers(vector<MonomerData> monomers) {
         for (auto m_data: monomers) {
-            m_monomers.emplace_back(m_data, m_space);
+            m_monomers.emplace_back(make_unique<Monomer>(m_data, m_space));
         }
     }
 }

@@ -4,15 +4,15 @@
 #include <vector>
 #include <iostream>
 
-#include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/ifile.h"
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/particle.h"
 #include "BlobCrystallinOligomer/space.h"
 
 namespace monomer {
 
-    using file::MonomerData;
-    using file::ParticleData;
+    using ifile::MonomerData;
+    using ifile::ParticleData;
     using particle::Orientation;
     using particle::OrientedPatchyParticle;
     using particle::Particle;
@@ -31,8 +31,10 @@ namespace monomer {
 
         // Create reference array
         for (auto &p: m_particles) {
-            m_particle_refs.emplace_back(p);
+            m_particle_refs.emplace_back(*p);
         }
+
+        m_num_particles = m_particles.size();
     }
 
     int Monomer::get_index() {
@@ -40,8 +42,11 @@ namespace monomer {
     }
 
     particleArrayT Monomer::get_particles() {
-
         return m_particle_refs;
+    }
+
+    int Monomer::get_num_particles() {
+        return m_num_particles;
     }
 
     vecT Monomer::get_center() {

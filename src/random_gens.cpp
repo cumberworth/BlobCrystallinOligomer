@@ -5,7 +5,7 @@
 
 #include "BlobCrystallinOligomer/random_gens.h"
 
-namespace random_gen {
+namespace random_gens {
 
     using std::uniform_int_distribution;
     using std::unique_ptr;

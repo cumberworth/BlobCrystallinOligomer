@@ -22,7 +22,7 @@ namespace particle {
         public:
             Particle(int index, int type, vecT pos, Orientation ore,
                     CuboidPBC& pbc_space);
-            virtual ~Particle();
+            virtual ~Particle() {}
 
             int get_index();
             int get_type();

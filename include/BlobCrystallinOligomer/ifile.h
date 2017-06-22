@@ -1,8 +1,9 @@
-// file.h
+// ifile.h
 
-#ifndef FILE_H
-#define FILE_H
+#ifndef IFILE_H
+#define IFILE_H
 
+#include <fstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -11,16 +12,23 @@
 #include "BlobCrystallinOligomer/shared_types.h"
 #include "Json/json.hpp"
 
-namespace file {
+namespace ifile {
 
     using shared_types::vecT;
     using shared_types::distT;
+    using shared_types::stepT;
     using std::pair;
     using std::unordered_map;
     using std::string;
     using std::vector;
 
     typedef nlohmann::json json;
+
+    vecT json2vec(json jvec);
+    /*  Convert a 3D json vector to an eigen vector.
+
+        Probably a better way to do this than having a custom function
+    */
 
     struct ParticleData {
         int index;
@@ -43,11 +51,13 @@ namespace file {
             InputConfigFile(string filename);
             vector<MonomerData> get_monomers();
             distT get_box_len();
+            distT get_radius();
 
         private:
             json m_config_json;
             vector<MonomerData> m_monomers;
             distT m_box_len;
+            distT m_radius;
 
             void parse_json();
 
@@ -85,9 +95,6 @@ namespace file {
             void parse_json();
 
     };
-
-    class OutputConfigFile {
-    };
 }
 
-#endif // FILE_H
+#endif // IFILE_H

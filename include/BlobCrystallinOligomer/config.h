@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/ifile.h"
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/param.h"
 #include "BlobCrystallinOligomer/particle.h"
@@ -16,9 +16,9 @@
 
 namespace config {
 
-    using file::InputConfigFile;
-    using file::MonomerData;
-    using file::ParticleData;
+    using ifile::InputConfigFile;
+    using ifile::MonomerData;
+    using ifile::ParticleData;
     using monomer::Monomer;
     using param::InputParams;
     using particle::Particle;
@@ -44,6 +44,12 @@ namespace config {
             
             monomerArrayT get_monomers();
 
+            int get_num_particles();
+
+            distT get_box_len();
+
+            distT get_radius();
+
             vecT calc_interparticle_vector(
                     Particle& particle1,
                     CoorSet coorset1,
@@ -64,6 +70,8 @@ namespace config {
             unique_ptr<CuboidPBC> m_space_store;
             CuboidPBC& m_space;
             RandomGens& m_random_num;
+            distT m_box_len;
+            distT m_radius;
 
             void create_monomers(vector<MonomerData>);
     };

@@ -7,7 +7,7 @@ BUILDDIR = build
 PREFIX = ../../
 TARGET = blobCrystallinOligomer
 TARGETDIR = bin
-SRCDIR = src/BlobCrystallinOligomer
+SRCDIR = src
 INCLUDEDIR = include
 EXTERNALHEADERS =
 EXTERNALLIBS = -lboost_program_options -lboost_mpi -lboost_serialization
@@ -22,8 +22,8 @@ SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(subst .cpp,.o,$(SOURCES))
 OBJECTS := $(subst $(SRCDIR),$(BUILDDIR),$(OBJECTS))
 
-CPP = mpicxx
-CPPFLAGS = -I$(INCLUDEDIR) $(EXTERNALHEADERS) $(OPTLEVEL)
+CPP = clang++
+CPPFLAGS = -I$(INCLUDEDIR) $(EXTERNALHEADERS) $(OPTLEVEL) --std=c++14
 LDFLAGS = $(EXTERNALLIBS) $(OPTLEVEL)
 
 DEPDIR = .d

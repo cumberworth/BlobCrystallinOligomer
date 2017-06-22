@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "BlobCrystallinOligomer/config.h"
-#include "BlobCrystallinOligomer/file.h"
+#include "BlobCrystallinOligomer/ifile.h"
 #include "BlobCrystallinOligomer/hash.h"
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/param.h"
@@ -21,8 +21,8 @@ namespace energy {
 
     using config::Config;
     using config::monomerArrayT;
-    using file::InteractionData;
-    using file::PotentialData;
+    using ifile::InteractionData;
+    using ifile::PotentialData;
     using monomer::Monomer;
     using param::InputParams;
     using particle::Particle;
@@ -74,6 +74,7 @@ namespace energy {
         private:
             Config& m_config;
             vector<unique_ptr<PairPotential>> m_potentials;
+            //unordered_map<pair<int, int>, reference_wrapper<PairPotential>> m_pair_to_pot;
             unordered_map<pair<int, int>, reference_wrapper<PairPotential>> m_pair_to_pot;
 
             void create_potentials(vector<PotentialData> potentials,

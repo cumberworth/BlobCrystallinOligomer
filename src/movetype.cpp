@@ -6,6 +6,7 @@
 
 #include "Eigen/Geometry"
 
+#include "BlobCrystallinOligomer/config.h"
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/movetype.h"
 #include "BlobCrystallinOligomer/param.h"

@@ -13,9 +13,9 @@ namespace energy {
 
     using config::Config;
     using config::monomerArrayT;
-    using file::InputEnergyFile;
-    using file::InteractionData;
-    using file::PotentialData;
+    using ifile::InputEnergyFile;
+    using ifile::InteractionData;
+    using ifile::PotentialData;
     using monomer::Monomer;
     using monomer::particleArrayT;
     using param::InputParams;
@@ -83,7 +83,7 @@ namespace energy {
         distT dist {m_config.calc_dist(particle1, coorset1, particle2, coorset2)};
         pair<int, int> key {particle1.get_type(), particle2.get_type()};
 
-        PairPotential& pot {m_pair_to_pot[key].get()};
+        PairPotential& pot {m_pair_to_pot.at(key).get()};
         bool interacting {pot.particles_interacting(dist)};
 
         return interacting;
@@ -115,7 +115,7 @@ namespace energy {
         auto p2_ore {particle2.get_ore(coorset1)};
         pair<int, int> key {particle1.get_type(), particle2.get_type()};
 
-        PairPotential& pot {m_pair_to_pot[key].get()};
+        PairPotential& pot {m_pair_to_pot.at(key).get()};
         eneT ene {pot.calc_energy(dist, diff, p1_ore, p2_ore)};
 
         return ene;
@@ -148,9 +148,9 @@ namespace energy {
         for (auto i_data: interactions) {
             for (auto p_pair: i_data.particle_pairs) {
                 PairPotential& pot {*m_potentials[i_data.potential_index]};
-                m_pair_to_pot[p_pair] = pot;
+                m_pair_to_pot.emplace(p_pair, pot);
                 pair<int, int> reversed_p_pair {p_pair.second, p_pair.first};
-                m_pair_to_pot[reversed_p_pair] = pot;
+                m_pair_to_pot.emplace(reversed_p_pair, pot);
             }
         }
     }

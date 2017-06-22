@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -30,6 +31,7 @@ namespace movetype {
     using std::pair;
     using std::set;
     using std::sqrt;
+    using std::string;
     using std::vector;
 
     vecT random_unit_vector(RandomGens& random_num);
@@ -41,6 +43,7 @@ namespace movetype {
             MCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
                     InputParams params);
             virtual bool move() = 0;
+            virtual string label() {return "MCMovetype";}
 
         protected:
             Config& m_config;
@@ -49,10 +52,18 @@ namespace movetype {
             eneT m_beta;
     };
 
+    class NTDFlipMCMovetype: public MCMovetype {
+        public:
+            using MCMovetype::MCMovetype;
+            bool move();
+            string label() {return "NTDFlipMCMovetype";}
+    };
+
     class VMMCMovetype: public MCMovetype {
         public:
             using MCMovetype::MCMovetype;
             bool move();
+            string label() {return "VMMCMovetype";}
 
         private:
             monomerArrayT m_cluster;
@@ -77,6 +88,7 @@ namespace movetype {
         public:
             TranslationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
                     InputParams params);
+            string label() {return "RotationVMMCMovetype";}
         private:
             void generate_movemap(Monomer&);
             void apply_movemap(Monomer& monomer);
@@ -89,6 +101,7 @@ namespace movetype {
         public:
             RotationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
                     InputParams params);
+            string label() {return "TranslationVMMCMovetype";}
         private:
             void generate_movemap(Monomer& seed_monomer);
             void apply_movemap(Monomer& monomer);

@@ -11,6 +11,7 @@ namespace shared_types {
     typedef Eigen::Matrix3d rotMatT;
     typedef double distT;
     typedef double eneT;
+    typedef unsigned long long int stepT;
 
     enum class CoorSet {
         current,
