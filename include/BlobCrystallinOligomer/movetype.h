@@ -55,7 +55,7 @@ namespace movetype {
     class NTDFlipMCMovetype: public MCMovetype {
         public:
             using MCMovetype::MCMovetype;
-            bool move();
+            bool move() {}
             string label() {return "NTDFlipMCMovetype";}
     };
 

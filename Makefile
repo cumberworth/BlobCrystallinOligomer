@@ -6,8 +6,10 @@ OPTLEVEL = -g
 BUILDDIR = build
 PREFIX = ../../
 TARGET = blobCrystallinOligomer
+TESTTARGET = blobCrystallinOligomer_test
 TARGETDIR = bin
 SRCDIR = src
+TESTDIR = test
 INCLUDEDIR = include
 EXTERNALHEADERS =
 EXTERNALLIBS = -lboost_program_options -lboost_mpi -lboost_serialization
@@ -16,11 +18,16 @@ EXTERNALLIBS = -lboost_program_options -lboost_mpi -lboost_serialization
 # add -L/home/amc226/lib to $(EXTERNALLIBS)
 
 vpath %.h $(INCLUDEDIR)/
-vpath %.cpp $(SRCDIR)/
+vpath %.cpp $(SRCDIR)/ $(TESTDIR)/
 
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(subst .cpp,.o,$(SOURCES))
 OBJECTS := $(subst $(SRCDIR),$(BUILDDIR),$(OBJECTS))
+
+TESTSOURCES := $(wildcard $(TESTDIR)/*.cpp)
+TESTOBJECTS := $(subst .cpp,.o,$(TESTSOURCES))
+TESTOBJECTS := $(subst $(TESTDIR)/,$(BUILDDIR)/,$(TESTOBJECTS))
+TESTOBJECTS += $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 
 CPP = clang++
 CPPFLAGS = -I$(INCLUDEDIR) $(EXTERNALHEADERS) $(OPTLEVEL) --std=c++14
@@ -35,8 +42,13 @@ POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
 
 all: $(TARGETDIR)/$(TARGET)
 
+test: $(TARGETDIR)/$(TESTTARGET)
+
 $(TARGETDIR)/$(TARGET): $(OBJECTS)
-	$(CPP) $(LDFLAGS) -o $@ $^ 
+	$(CPP) $(LDFLAGS) -o $@ $^
+
+$(TARGETDIR)/$(TESTTARGET): $(TESTOBJECTS)
+	$(CPP) $(LDFLAGS) -o $@ $^
 
 $(BUILDDIR)/%.o: %.cpp
 $(BUILDDIR)/%.o: %.cpp $(DEPDIR)/%.d
