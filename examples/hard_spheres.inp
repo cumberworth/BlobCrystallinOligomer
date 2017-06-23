@@ -1,0 +1,18 @@
+# System input
+config_filename=single_particle.json
+energy_filename=hard_spheres.json
+temp=300
+
+# Simulation options
+steps=10000
+
+# Movetypes
+max_disp_tc=10
+max_disp_rc=1
+max_disp_a=1
+translation_vmmc=1
+
+# Output
+output_filebase=out/hard_spheres
+logging_freq=10
+config_output_freq=10

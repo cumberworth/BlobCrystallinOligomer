@@ -1,0 +1,168 @@
+{
+    "cgmonomer": {
+        "config": [
+            {
+                "index": 0,
+                "particles": [
+                    {
+                        "index": 0,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            2.157486855614331,
+                            2.706421954257725,
+                            -3.1978374977510082
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "particles": [
+                    {
+                        "index": 1,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            1.4358854480861138,
+                            -1.2637981748638838,
+                            -4.455547383056971
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "particles": [
+                    {
+                        "index": 2,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            -3.9821220955277092,
+                            -1.2152847061173155,
+                            4.888581361433989
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "particles": [
+                    {
+                        "index": 3,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            1.1476275450022577,
+                            -1.803133947597112,
+                            -1.5870303697232113
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "particles": [
+                    {
+                        "index": 4,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            -1.7140574250283558,
+                            2.9397793254447144,
+                            3.4047222454117057
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "particles": [
+                    {
+                        "index": 5,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            2.577810511642152,
+                            4.93248570655399,
+                            3.924505700777181
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 6,
+                "particles": [
+                    {
+                        "index": 6,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            -0.28905745822976336,
+                            -3.038639538003236,
+                            -0.17683429319998112
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 7,
+                "particles": [
+                    {
+                        "index": 7,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            -2.389097643270608,
+                            0.2124030059755877,
+                            2.700839774131991
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 8,
+                "particles": [
+                    {
+                        "index": 8,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            4.837542204509041,
+                            -0.9864787658760676,
+                            -3.657673224949579
+                        ]
+                    }
+                ]
+            },
+            {
+                "index": 9,
+                "particles": [
+                    {
+                        "index": 9,
+                        "domain": "PAR",
+                        "form": "SimpleParticle",
+                        "type": 0,
+                        "pos": [
+                            -4.353101035599474,
+                            -1.9267302109121176,
+                            -3.079746095889236
+                        ]
+                    }
+                ]
+            }
+        ],
+        "radius": 1.0,
+        "box_len": 10
+    }
+}

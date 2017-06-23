@@ -1,0 +1,21 @@
+{
+    "cgmonomer": {
+        "energy": {
+            "potentials": [
+                {
+                    "form": "HardSphere",
+                    "index": 0,
+                    "parameters": {
+                        "sigh": 2
+                    }
+                }
+            ],
+            "interactions": [
+                {
+                    "pairs": [[0, 0]],
+                    "potential": 0
+                }
+            ]
+        }
+    }
+}
