@@ -16,6 +16,54 @@ import numpy as np
 
 
 class Monomer:
+    """General monomer class"""
+
+    def __init__(self):
+        self._cur_i = -1 # For iterating over contained particles
+
+    # Following two functions are iterator protocol to allow iteration over
+    # particles.
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self._cur_i += 1
+        if self._cur_i >= self._num_particles:
+            self._cur_i = -1
+            raise StopIteration
+        else:
+            return (self._particles)[self._cur_i]
+
+
+class SingleParticleMonomer(Monomer):
+    """Hard sphere monomer."""
+
+    def __init__(self, particles, radius, index):
+        self._particles = particles
+        self._radius = radius
+        self._index = index
+        self._num_particles = len(particles)
+
+        self._cur_i = -1 # For iterating over contained particles
+
+    @property
+    def index(self):
+        return self._index
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @property
+    def pos(self):
+        return self._particles[0].pos
+
+    @pos.setter
+    def pos(self, pos):
+        self._particles[0].pos = pos
+
+
+class AlphaBMonomer(Monomer):
     """Coarse-grain AlphaB crystallin monomer.
 
     Contains ACD partilces and NTD particles . ACDs protrude from origin with NTD
@@ -26,32 +74,23 @@ class Monomer:
             index):
         self._acd_particles = acd_particles
         self._ntd_particles = ntd_particles
+        self._particles = acd_particles + ntd_particles
         self._acd_radius = acd_radius
         self._ntd_radius = ntd_radius
         self._index = index
         self._num_particles = len(acd_particles) + len(ntd_particles)
 
-        self._cur_i = -1 # For iterating over contained particles
         self._num_acd_particles = len(acd_particles)
         self._num_ntd_particles = len(ntd_particles)
         self._num_particles = self._num_acd_particles + self._num_ntd_particles
 
-    # Following two functions are iterator protocol to allow iteration over
-    # particles
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        self._cur_i += 1
-        if self._cur_i >= self._num_particles:
-            self._cur_i = -1
-            raise StopIteration
-        else:
-            return (self._acd_particles + self._ntd_particles)[self._cur_i]
-
     @property
     def index(self):
         return self._index
+
+    @property
+    def radius(self):
+        return self._acd_radius
 
     @property
     def acd_radius(self):
@@ -101,13 +140,14 @@ class SimpleParticle:
 
     Defaults to homogenous coordinates."""
 
-    def __init__(self, index, domain, pos=None):
+    def __init__(self, index, domain, type, pos=None):
         self._index = index # Unique particle index
         self._domain = domain # Domain particle is representing (ACD or NTD)
+        self._type = type
         if pos is None:
             self.pos = np.array([0, 0, 0, 1.]) # Position
 
-        self._label = 'SimpleParticle' # Type label
+        self._form = 'SimpleParticle' # Type form
 
     @property
     def index(self):
@@ -115,15 +155,15 @@ class SimpleParticle:
 
     @property
     def type(self):
-        return self._domain
+        return self._type
 
     @property
     def domain(self):
         return self._domain
 
     @property
-    def label(self):
-        return self._label
+    def form(self):
+        return self._form
 
     def apply_transformation(self, M):
         """Apply the transformation matrix to all position vectors."""
@@ -141,7 +181,7 @@ class PatchyParticle(SimpleParticle):
         else:
             self._patch_norm = patch_norm
 
-        self._label = 'PatchyParticle' # Type label
+        self._form = 'PatchyParticle' # Type form
 
     @property
     def patch_norm(self):
@@ -165,7 +205,7 @@ class OrientedPatchyParticle(PatchyParticle):
         else:
             self._patch_orient = patch_orient
 
-        self._label = 'OrientedPatchyParticle' # Type label
+        self._form = 'OrientedPatchyParticle' # Type form
 
     @property
     def patch_orient(self):
@@ -231,13 +271,14 @@ class PDBConfigOutputFile:
                 elif particle.domain == 'NTD':
                     radius = monomer.ntd_radius
                 else:
-                    radius = 1
+                    radius = monomer.radius
 
                 atom_fields = {
                         'serial': particle.index,
                         'name': particle.domain,
                         'resName': 'ABC',
-                        'chainID': string.ascii_uppercase[monomer.index],
+                        #'chainID': string.ascii_uppercase[monomer.index],
+                        'chainID': 'A',
                         'resSeq': monomer.index,
                         'x': particle.pos[0],
                         'y': particle.pos[1],
@@ -253,7 +294,8 @@ class PDBConfigOutputFile:
                             'serial': particle.index,
                             'name': 'PAT',
                             'resName': 'ABC',
-                            'chainID': string.ascii_uppercase[monomer.index],
+                            #'chainID': string.ascii_uppercase[monomer.index],
+                            'chainID': 'A',
                             'resSeq': monomer.index,
                             'x': particle.pos[0] + particle.patch_norm[0],
                             'y': particle.pos[1] + particle.patch_norm[1],
@@ -269,7 +311,8 @@ class PDBConfigOutputFile:
                             'serial': particle.index,
                             'name': 'PAT',
                             'resName': 'ABC',
-                            'chainID': string.ascii_uppercase[monomer.index],
+                            #'chainID': string.ascii_uppercase[monomer.index],
+                            'chainID': 'A',
                             'resSeq': monomer.index,
                             'x': particle.pos[0] + particle.patch_orient[0],
                             'y': particle.pos[1] + particle.patch_orient[1],
@@ -284,7 +327,8 @@ class PDBConfigOutputFile:
         ter_fields = {
                 'serial': particle.index + 1,
                 'resName': 'ABC',
-                'chainID': string.ascii_uppercase[monomer.index],
+                #'chainID': string.ascii_uppercase[monomer.index],
+                'chainID': 'A',
                 'resSeq': monomer.index,
         }
         line = self._ter_template.format(**ter_fields)
@@ -292,7 +336,7 @@ class PDBConfigOutputFile:
 
 
 class JSONConfigOutputFile:
-    """Configuration in PDB format"""
+    """Configuration in JSON format"""
 
     def __init__(self, filename):
         self._filename = filename
@@ -301,6 +345,7 @@ class JSONConfigOutputFile:
         """Write json format of coarse-grained alphaB crystallin model."""
         cgmonomer_json = {}
         cgmonomer_json['cgmonomer'] = {'config': []}
+        cgmonomer_json['cgmonomer']['radius'] = monomers[0].radius
         for monomer in monomers:
             monomer_json = {}
             monomer_json['index'] = monomer.index
@@ -309,12 +354,13 @@ class JSONConfigOutputFile:
                 particle_json = {}
                 particle_json['index'] = particle.index
                 particle_json['domain'] = particle.domain
-                particle_json['type'] = particle.label
+                particle_json['form'] = particle.form
+                particle_json['type'] = particle.type
                 particle_json['pos'] = particle.pos.tolist()[:3]
-                if 'Patchy' in particle.label:
+                if 'Patchy' in particle.form:
                     particle_json['patch_norm'] = particle.patch_norm.tolist()[:3]
 
-                if 'Oriented' in particle.label:
+                if 'Oriented' in particle.form:
                     particle_json['patch_orient'] = particle.patch_orient.tolist()[:3]
 
                 monomer_json['particles'].append(particle_json)

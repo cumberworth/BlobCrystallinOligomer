@@ -27,7 +27,9 @@ namespace particle {
             int get_index();
             int get_type();
             vecT get_pos(CoorSet coorset);
-            Orientation get_ore(CoorSet coorset);
+            Orientation& get_ore(CoorSet coorset);
+
+            void set_pos(vecT pos);
 
             void translate(vecT disv);
             /*  Translate particle by given vector and store as trial*/

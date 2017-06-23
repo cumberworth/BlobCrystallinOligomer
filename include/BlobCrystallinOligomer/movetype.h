@@ -77,7 +77,7 @@ namespace movetype {
 
             void add_interacting_pairs(Monomer& monomer1);
             pair<int, int> select_random_pair();
-            double calc_prelink_prob(eneT delta_e);
+            double calc_prelink_prob(eneT ene1, eneT ene2);
             bool accept_prelink(double prelink_p);
             bool accept_link(double prelink_for_p, double prelink_rev_p);
             bool accept_move();
@@ -88,7 +88,7 @@ namespace movetype {
         public:
             TranslationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
                     InputParams params);
-            string label() {return "RotationVMMCMovetype";}
+            string label() {return "TranslationVMMCMovetype";}
         private:
             void generate_movemap(Monomer&);
             void apply_movemap(Monomer& monomer);
@@ -101,7 +101,7 @@ namespace movetype {
         public:
             RotationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
                     InputParams params);
-            string label() {return "TranslationVMMCMovetype";}
+            string label() {return "RotationVMMCMovetype";}
         private:
             void generate_movemap(Monomer& seed_monomer);
             void apply_movemap(Monomer& monomer);

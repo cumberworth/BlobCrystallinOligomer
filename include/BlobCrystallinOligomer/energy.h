@@ -38,6 +38,8 @@ namespace energy {
     class Energy {
         public:
             Energy(Config& conf, InputParams params);
+            Energy(Config& conf, vector<PotentialData>,
+                    vector<InteractionData>);
 
             eneT calc_monomer_pair_energy(
                     Monomer& monomer1,

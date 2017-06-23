@@ -25,6 +25,7 @@ namespace energy {
     using potential::OrientedPatchyPotential;
     using shared_types::CoorSet;
     using shared_types::distT;
+    using shared_types::inf;
     using shared_types::vecT;
     using std::shared_ptr;
     using std::vector;
@@ -47,8 +48,12 @@ namespace energy {
         for (size_t p1_i {0}; p1_i != particles1.size(); p1_i++) {
             for (size_t p2_i {p1_i}; p2_i != particles2.size(); p2_i++) {
                 Particle& p1 = particles1[p1_i]; // Doesn't allow {} intialization
-                Particle& p2 = particles1[p2_i];
-                pair_ene += calc_particle_pair_energy(p1, coorset1, p2, coorset2);
+                Particle& p2 = particles2[p2_i];
+                eneT part_ene {calc_particle_pair_energy(p1, coorset1, p2, coorset2)};
+                if (part_ene == inf) {
+                    return inf;
+                }
+                pair_ene += part_ene;
             }
         }
 
@@ -64,7 +69,7 @@ namespace energy {
         for (size_t p1_i {0}; p1_i != particles1.size(); p1_i++) {
             for (size_t p2_i {p1_i}; p2_i != particles2.size(); p2_i++) {
                 Particle& p1 = particles1[p1_i]; // Doesn't allow {} intialization
-                Particle& p2 = particles1[p2_i];
+                Particle& p2 = particles2[p2_i];
                 bool p_interacting {particles_interacting(p1, coorset1, p2,
                         coorset2)};
                 if (p_interacting) {
@@ -92,17 +97,19 @@ namespace energy {
     monomerArrayT Energy::get_interacting_monomers(Monomer& monomer1,
             CoorSet coorset1) {
         monomerArrayT monomers {m_config.get_monomers()};
+        monomerArrayT interacting_monomers {};
         CoorSet coorset2 {CoorSet::current};
-        for (Monomer& monomer2: monomers) {
+        for (size_t i {0}; i != monomers.size(); i++) {
+            Monomer& monomer2 {monomers[i].get()};
             if (monomer1.get_index() == monomer2.get_index()) {
                 continue;
             }
             if (monomers_interacting(monomer1, coorset1, monomer2, coorset2)) {
-                monomers.push_back(monomer2);
+                interacting_monomers.push_back(monomer2);
             }
         }
 
-        return monomers;
+        return interacting_monomers;
     }
 
     eneT Energy::calc_particle_pair_energy(Particle& particle1, CoorSet coorset1,

@@ -48,7 +48,11 @@ namespace param {
         // Command line options
         po::options_description cl_options {"Command line options"};
         cl_options.add_options()
-            ("parameter_filename,i", po::value<string>())
+            ("parameter_filename,i",
+                po::value<string>(),
+                "Input file")
+            ("help,h",
+             "Display available options")
         ;
         displayed_options.add(cl_options);
 
@@ -65,13 +69,15 @@ namespace param {
                 po::value<eneT>(&m_temp)->default_value(300),
                 "Maximum dispacement for translations")
         ;
+        displayed_options.add(inp_options);
+
         po::options_description sim_options {"Simulation options"};
         sim_options.add_options()
             ("steps",
                 po::value<stepT>(&m_steps)->default_value(0),
                 "Number of steps")
         ;
-        displayed_options.add(inp_options);
+        displayed_options.add(sim_options);
 
         po::options_description move_options {"Movetype options"};
         move_options.add_options()
@@ -118,7 +124,10 @@ namespace param {
         po::store(po::parse_command_line(argc, argv, displayed_options), vm);
         po::notify(vm);
         if (vm.count("help")) {
+            cout << "\n";
             cout << displayed_options;
+            cout << "\n";
+            exit(1);
         }
         if (not vm.count("parameter_filename")) {
             cout << "Input parameter file must be provided.\n";

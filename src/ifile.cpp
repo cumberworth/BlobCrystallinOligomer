@@ -110,10 +110,10 @@ namespace ifile {
         }
         json json_inters {m_energy_json["cgmonomer"]["energy"]["interactions"]};
         for (auto json_inter: json_inters) {
-            vector<vector<int>> raw_pairs {json_inter["pairs"]};
+            auto raw_pairs {json_inter["pairs"]};
             vector<pair<int, int>> particle_pairs {};
-            for (auto p_pair: raw_pairs) {
-                particle_pairs.push_back({p_pair[0], p_pair[1]});
+            for (auto ipair: raw_pairs) {
+                particle_pairs.emplace_back(ipair[0], ipair[1]);
             }
             int potential {json_inter["potential"]};
             InteractionData i_data {particle_pairs, potential};

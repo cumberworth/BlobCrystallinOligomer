@@ -2,7 +2,7 @@
 
 """Create coordinates for coarse-grained alphaB-crystallin 24-mer
 
-Output in pdb format
+Output in pdb and json format
 """
 
 import argparse
@@ -109,7 +109,7 @@ def construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
             particle_i += 1
             ntd_particles.append(particle)
 
-        monomer = model.Monomer(acd_particles, ntd_particles, acd_radius,
+        monomer = model.AlphaBMonomer(acd_particles, ntd_particles, acd_radius,
                 ntd_radius, monomer_i)
         monomer = orient_monomer(monomer, acd_ntd_angle)
         monomers.append(monomer)
@@ -283,7 +283,7 @@ def construct_tetrahedral(arm_length):
     monomers = []
     for trans_mon, i in zip(trans_mons, range(4)):
         particle = model.SimpleParticle(i, 'TET')
-        monomer = model.Monomer([particle], [], 1, 1, i)
+        monomer = model.AlphaBMonomer([particle], [], 1, 1, i)
         monomer.apply_transformation(trans_mon)
         monomers.append(monomer)
 

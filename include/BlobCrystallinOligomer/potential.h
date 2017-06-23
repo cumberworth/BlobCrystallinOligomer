@@ -14,63 +14,63 @@ namespace potential {
     using shared_types::vecT;
 
     // Should do a fast version that takes presquared values
-    eneT guassian(double theta, double sig);
+    eneT guassian(distT theta, distT sig);
 
     class PairPotential {
         public:
-            PairPotential(double rcut);
-            virtual eneT calc_energy(distT rdist, vecT p_diff, Orientation ore1,
-                    Orientation ore2) = 0;
+            PairPotential(distT rcut);
+            virtual eneT calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
+                    Orientation& ore2) = 0;
             bool particles_interacting(distT rdist);
 
         private:
-            double m_rcut;
+            distT m_rcut;
     };
 
     class HardSpherePotential: public PairPotential {
         public:
-            HardSpherePotential(double sigh);
-            eneT calc_energy(distT rdist, vecT, Orientation, Orientation);
+            HardSpherePotential(distT sigh);
+            eneT calc_energy(distT rdist, vecT&, Orientation&, Orientation&);
         private:
-            double m_sigh; // Sphere radius
+            distT m_sigh; // Sphere radius
     };
 
     class ShiftedLJPotential: public PairPotential {
         public:
-            ShiftedLJPotential(double eps, double sigl, double rcut);
-            eneT calc_energy(distT rdist, vecT, Orientation ore1, Orientation ore2);
+            ShiftedLJPotential(eneT eps, distT sigl, distT rcut);
+            eneT calc_energy(distT rdist, vecT&, Orientation& ore1, Orientation& ore2);
 
         private:
-            double m_eps; // Well depth
-            double m_four_eps; // Well depth premultiplied by 4
-            double m_sigl; // Zero point
-            double m_rcut; // Cutoff
-            double m_shift; // Shift
+            eneT m_eps; // Well depth
+            eneT m_four_eps; // Well depth premultiplied by 4
+            distT m_sigl; // Zero point
+            distT m_rcut; // Cutoff
+            eneT m_shift; // Shift
     };
 
     class PatchyPotential: public PairPotential {
         public:
-            PatchyPotential(double eps, double sigl, double rcut, double siga1,
-                    double siga2);
-            eneT calc_energy(distT rdist, vecT p_diff, Orientation ore1,
-                    Orientation ore2);
+            PatchyPotential(eneT eps, distT sigl, distT rcut, distT siga1,
+                    distT siga2);
+            eneT calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
+                    Orientation& ore2);
 
         private:
             ShiftedLJPotential m_lj; // Radial component
-            double m_siga1; // Patch width of particle 1
-            double m_siga2; // Patch width of particle 2
+            distT m_siga1; // Patch width of particle 1
+            distT m_siga2; // Patch width of particle 2
     };
 
     class OrientedPatchyPotential: public PairPotential {
         public:
-            OrientedPatchyPotential(double eps, double sigl, double rcut,
-                    double siga1, double siga2, double sigt);
-            eneT calc_energy(distT rdist, vecT p_diff, Orientation ore1,
-                    Orientation ore2);
+            OrientedPatchyPotential(eneT eps, distT sigl, distT rcut,
+                    distT siga1, distT siga2, distT sigt);
+            eneT calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
+                    Orientation& ore2);
 
         private:
             PatchyPotential m_patchy; // Unoriented-patchy potential
-            double m_sigt; // Orientation width
+            distT m_sigt; // Orientation width
     };
 }
 

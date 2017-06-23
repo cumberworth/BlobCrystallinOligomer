@@ -29,10 +29,11 @@ namespace simulation {
     NVTMCSimulation::NVTMCSimulation(Config& conf, Energy& ene,
             InputParams params, RandomGens& random_num):
             m_config {conf}, m_energy {ene}, m_random_num {random_num},
-            m_beta {1/params.m_temp}, m_logging_freq {params.m_logging_freq},
+            m_beta {1/params.m_temp}, m_steps {params.m_steps},
+            m_logging_freq {params.m_logging_freq},
             m_config_output_freq {params.m_config_output_freq},
             m_op_output_freq {params.m_op_output_freq},
-            m_config_file {params.m_output_filebase + ".confs", conf} {
+            m_config_file {params.m_output_filebase + ".vtf", conf} {
 
         construct_movetypes(params);
     }
@@ -47,12 +48,12 @@ namespace simulation {
             m_move_accepts[movetype_i] += accepted;
 
             // Log
-            if (m_logging_freq and step % m_logging_freq) {
+            if (m_logging_freq and step % m_logging_freq == 0) {
                 log_move(step, movetype.label(), accepted);
             }
 
             // Output configuration and order parameters
-            if (m_config_output_freq and step % m_config_output_freq) {
+            if (m_config_output_freq and step % m_config_output_freq == 0) {
                 m_config_file.write_timestep(m_config, step);
             }
             //if (m_op_output_freq and step % m_op_output_freq) {
@@ -89,6 +90,12 @@ namespace simulation {
             m_movetypes.emplace_back(movetype);
             cum_prob += params.m_ntd_flip;
             m_cum_probs.push_back(cum_prob);
+        }
+
+        // Prepare vectors that track movetype information
+        for (size_t i {0}; i != m_movetypes.size(); i++) {
+            m_move_attempts.push_back(0);
+            m_move_accepts.push_back(0);
         }
     }
 

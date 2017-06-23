@@ -9,6 +9,7 @@ namespace potential {
 
     using shared_types::eneT;
     using shared_types::distT;
+    using shared_types::inf;
     using shared_types::vecT;
     using std::acos;
     using std::exp;
@@ -33,10 +34,10 @@ namespace potential {
             PairPotential {sigh}, m_sigh {sigh} {
     }
 
-    eneT HardSpherePotential::calc_energy(distT rdist, vecT, Orientation, Orientation) {
+    eneT HardSpherePotential::calc_energy(distT rdist, vecT&, Orientation&, Orientation&) {
         eneT ene {0};
         if (rdist < m_sigh) {
-            // ene is infinity
+            ene = inf;
         }
 
         return ene;
@@ -48,14 +49,14 @@ namespace potential {
             m_sigl {sigl}, m_rcut {rcut} {
 
         distT sig_r_ratio {m_sigl/rcut};
-        m_shift = m_four_eps*pow(sig_r_ratio, 12) - pow(sig_r_ratio, 6);
+        m_shift = m_four_eps*(pow(sig_r_ratio, 12) - pow(sig_r_ratio, 6));
     }
 
-    eneT ShiftedLJPotential::calc_energy(distT rdist, vecT, Orientation,
-            Orientation) {
+    eneT ShiftedLJPotential::calc_energy(distT rdist, vecT&, Orientation&,
+            Orientation&) {
         distT sig_r_ratio {m_sigl/rdist};
         eneT ene;
-        ene = m_four_eps*pow(sig_r_ratio, 12) - pow(sig_r_ratio, 6) - m_shift;
+        ene = m_four_eps*(pow(sig_r_ratio, 12) - pow(sig_r_ratio, 6)) - m_shift;
 
         return ene;
     }
@@ -66,8 +67,8 @@ namespace potential {
             m_siga2 {siga2} {
     }
 
-    eneT PatchyPotential::calc_energy(distT rdist, vecT p_diff, Orientation ore1,
-            Orientation ore2) {
+    eneT PatchyPotential::calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
+            Orientation& ore2) {
 
         eneT ene {0};
         distT dot1 {p_diff.dot(ore1.patch_norm)};
@@ -87,8 +88,8 @@ namespace potential {
             m_sigt {sigt} {
     }
 
-    eneT OrientedPatchyPotential::calc_energy(distT rdist, vecT p_diff,
-            Orientation ore1, Orientation ore2) {
+    eneT OrientedPatchyPotential::calc_energy(distT rdist, vecT& p_diff,
+            Orientation& ore1, Orientation& ore2) {
 
         eneT ene {0};
         vecT unit_p_diff {p_diff / p_diff.norm()};

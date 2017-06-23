@@ -41,12 +41,26 @@ namespace config {
         }
     }
 
+    Config::Config(vector<MonomerData> monomers, RandomGens& random_num,
+            distT box_len, distT radius):
+            m_space_store {new CuboidPBC()}, m_space {*m_space_store},
+            m_random_num {random_num}, m_box_len {box_len}, m_radius {radius} {
+
+        m_space.set_len(m_box_len);
+        create_monomers(monomers);
+
+        // Create monomer reference array
+        for (auto &m: m_monomers) {
+            m_monomer_refs.emplace_back(*m);
+        }
+    }
+
     Monomer& Config::get_monomer(int monomer_index) {
         return *m_monomers[monomer_index];
     }
     
     Monomer& Config::get_random_monomer() {
-        int m_i {m_random_num.uniform_int(0, m_monomers.size())};
+        int m_i {m_random_num.uniform_int(0, m_monomers.size() - 1)};
         return *m_monomers[m_i];
     }
 

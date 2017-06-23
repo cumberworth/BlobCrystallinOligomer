@@ -18,8 +18,9 @@ namespace movetype {
     using Eigen::AngleAxis;
     using monomer::Monomer;
     using param::InputParams;
-    using shared_types::eneT;
     using shared_types::distT;
+    using shared_types::eneT;
+    using shared_types::inf;
     using shared_types::vecT;
     using shared_types::CoorSet;
     using std::exp;
@@ -58,6 +59,7 @@ namespace movetype {
 
     bool VMMCMovetype::move() {
         Monomer& monomer_seed {m_config.get_random_monomer()};
+        m_cluster.emplace_back(monomer_seed);
         generate_movemap(monomer_seed);
         apply_movemap(monomer_seed);
         add_interacting_pairs(monomer_seed);
@@ -69,14 +71,14 @@ namespace movetype {
                     CoorSet::current, monomer2, CoorSet::current)};
             eneT ene_2 {m_energy.calc_monomer_pair_energy(monomer1,
                     CoorSet::trial, monomer2, CoorSet::current)};
-            double prelink_for_p {calc_prelink_prob(ene_2 - ene_1)};
+            double prelink_for_p {calc_prelink_prob(ene_1, ene_2)};
             bool prelink_accepted {accept_prelink(prelink_for_p)};
             if (not prelink_accepted) {
                 continue;
             }
             eneT ene_3 {m_energy.calc_monomer_pair_energy(monomer1,
                     CoorSet::trial, monomer2, CoorSet::current)};
-            double prelink_rev_p {calc_prelink_prob(ene_3 - ene_1)};
+            double prelink_rev_p {calc_prelink_prob(ene_1, ene_3)};
             bool link_accepted {accept_link(prelink_for_p, prelink_rev_p)};
             if (not link_accepted) {
                 m_frustrated_links++;
@@ -140,8 +142,14 @@ namespace movetype {
         return *it;
     }
 
-    double VMMCMovetype::calc_prelink_prob(eneT delta_e) {
-        return fmax(0, 1 - exp(-m_beta * delta_e));
+    double VMMCMovetype::calc_prelink_prob(eneT ene1, eneT ene2) {
+        // ene1 should never be infinite
+        if (ene2 == inf) {
+            return 1;
+        }
+        else {
+            return fmax(0, 1 - exp(-m_beta * (ene2 - ene1)));
+        }
     }
 
     bool VMMCMovetype::accept_prelink(double prelink_p) {

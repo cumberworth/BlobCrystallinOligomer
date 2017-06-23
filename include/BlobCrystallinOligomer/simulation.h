@@ -56,7 +56,6 @@ namespace simulation {
             vector<double> m_cum_probs;
             vector<stepT> m_move_attempts;
             vector<stepT> m_move_accepts;
-            vector<double> m_acceptance_p;
 
             stepT m_steps;
             stepT m_logging_freq;

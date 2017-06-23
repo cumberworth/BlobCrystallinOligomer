@@ -43,6 +43,7 @@ POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
 all: $(TARGETDIR)/$(TARGET)
 
 test: $(TARGETDIR)/$(TESTTARGET)
+	$(TARGETDIR)/$(TESTTARGET)
 
 $(TARGETDIR)/$(TARGET): $(OBJECTS)
 	$(CPP) $(LDFLAGS) -o $@ $^

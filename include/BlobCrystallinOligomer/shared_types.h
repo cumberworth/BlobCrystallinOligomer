@@ -3,7 +3,9 @@
 #ifndef SHARED_TYPES_H
 #define SHARED_TYPES_H
 
-#include <Eigen/Dense>
+#include <limits>
+
+#include "Eigen/Dense"
 
 namespace shared_types {
 
@@ -12,6 +14,7 @@ namespace shared_types {
     typedef double distT;
     typedef double eneT;
     typedef unsigned long long int stepT;
+    const double inf {std::numeric_limits<double>::infinity()};
 
     enum class CoorSet {
         current,

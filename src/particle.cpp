@@ -32,7 +32,7 @@ namespace particle {
         }
     }
 
-    Orientation Particle::get_ore(CoorSet coorset) {
+    Orientation& Particle::get_ore(CoorSet coorset) {
         if (coorset == CoorSet::current) {
             return m_ore;
         }
@@ -41,16 +41,19 @@ namespace particle {
         }
     }
 
+    void Particle::set_pos(vecT pos) {
+        m_pos = pos;
+    }
+
     void Particle::translate(vecT disv) {
-        vecT new_pos {m_pos + disv};
-        new_pos = m_space.wrap(new_pos);
-        m_trial_pos = new_pos;
+        m_trial_pos = m_pos + disv;
+        m_trial_pos = m_space.wrap(m_trial_pos);
     }
 
     void Particle::rotate(vecT rot_c, rotMatT rot_mat) {
-        translate(-rot_c);
-        m_pos = rot_mat * m_pos;
-        translate(rot_c);
+        m_trial_pos = m_pos - rot_c;
+        m_trial_pos = rot_mat * m_trial_pos;
+        m_trial_pos = m_trial_pos + rot_c;
     }
 
     void Particle::trial_to_current() {
@@ -65,7 +68,7 @@ namespace particle {
 
     void PatchyParticle::rotate(vecT rot_c, rotMatT rot_mat) {
         Particle::rotate(rot_c, rot_mat);
-        m_ore.patch_norm = rot_mat * m_ore.patch_norm;
+        m_trial_ore.patch_norm = rot_mat * m_ore.patch_norm;
     }
 
     OrientedPatchyParticle::OrientedPatchyParticle(int index, int type,
@@ -75,6 +78,6 @@ namespace particle {
 
     void OrientedPatchyParticle::rotate(vecT rot_c, rotMatT rot_mat) {
         PatchyParticle::rotate(rot_c, rot_mat);
-        m_ore.patch_orient = rot_mat * m_ore.patch_orient;
+        m_trial_ore.patch_orient = rot_mat * m_ore.patch_orient;
     }
 }
