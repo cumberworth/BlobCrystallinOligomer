@@ -1,14 +1,8 @@
 // ofile.cpp
 
-#include <fstream>
-#include <string>
-
-#include "Json/json.hpp"
-
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/ofile.h"
 #include "BlobCrystallinOligomer/particle.h"
-#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace ofile {
 
@@ -36,7 +30,7 @@ namespace ofile {
         m_file << "\n";
     }
 
-    void OutputConfigsFile::write_timestep(Config& conf, stepT) {
+    void OutputConfigsFile::write_step(Config& conf, stepT) {
         m_file << "t" << "\n";
         for (Monomer& mono: conf.get_monomers()) {
             for (Particle& part: mono.get_particles()) {

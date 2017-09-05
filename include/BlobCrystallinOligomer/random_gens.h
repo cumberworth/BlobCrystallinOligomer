@@ -20,17 +20,17 @@ namespace random_gens {
     using std::unique_ptr;
     using std::vector;
 
+    /** Class for storing and using instances of random number generators */
     class RandomGens {
         public:
-            /*  Class for storing and using instances of random number generators */
 
             RandomGens();
 
+            /** Draw a real number uniformly from 0 < x < 1 */
             double uniform_real() ;
-            /*  Draw a real number uniformly from 0 < x < 1 */
 
+            /** Draw an integer uniformly from lower <= x <= upper. */
             int uniform_int(int lower, int upper);
-            /*  Draw an integer uniformly from lower <= x <= upper. */
 
         private:
             mt19937_64 m_random_engine {};

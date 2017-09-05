@@ -23,27 +23,28 @@ namespace ofile {
 
     typedef nlohmann::json json;
 
+    /** JSON file format for single configuration output */
     class OutputConfigFile {
-        /*  JSON file format for single configuration output */
     };
 
+    /** VTF/Tcl file format for "trajectory" configuration output
+      *
+      * The VTF format allows the particle positions to be read by VMD.
+      * However, it cannot read patch vectors, so these are written to a Tcl
+      * script.
+      */
     class OutputConfigsFile {
-        /*  VTF/Tcl file format for "trajectory" configuration output
-       
-            The VTF format allows the particle positions to be read by VMD.
-            However, it cannot patch vectors, so these are written to a Tcl
-            script.
-       */
         public:
             OutputConfigsFile(string filename, Config& conf);
 
+            /** Write system properties and topology.
+              *
+              * For now this is just the box size and the particle radii
+              */
             void write_structure(Config& conf);
-            /*  Write system properties and topology.
 
-                For now this is just the box size and the particle radii
-            */
-
-            void write_timestep(Config& config, stepT step);
+            /** Write configuration at current step */
+            void write_step(Config& config, stepT step);
 
         private:
             std::ofstream m_file;

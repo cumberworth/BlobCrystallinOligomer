@@ -3,19 +3,17 @@
 #include <cmath>
 
 #include "BlobCrystallinOligomer/potential.h"
-#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace potential {
 
-    using shared_types::eneT;
-    using shared_types::distT;
     using shared_types::inf;
-    using shared_types::vecT;
     using std::acos;
     using std::exp;
     using std::pow;
 
     eneT gaussian(double theta, double sig) {
+
+        // Should do a fast version that takes presquared values
         return exp(-pow(theta, 2)/(2*pow(sig, 2)));
     }
 

@@ -35,43 +35,49 @@ namespace energy {
     using std::unordered_map;
     using std::vector;
 
+    /** System energy
+      *
+      * Contains all potentials present in system and maps from pairs of
+      * particles to their interaction potential type. Responsible for
+      * instantiating the potentials.
+      */
     class Energy {
         public:
             Energy(Config& conf, InputParams params);
             Energy(Config& conf, vector<PotentialData>,
                     vector<InteractionData>);
 
+            /** Calculate pair energy between two monomers */
             eneT calc_monomer_pair_energy(
                     Monomer& monomer1,
                     CoorSet coorset1,
                     Monomer& monomer2,
                     CoorSet coorset2);
-            /*  Calculate pair energy between two monomers.*/
 
+            /** Check if monomers within range to have non-zero pair potential */
             bool monomers_interacting(
                     Monomer& monomer1,
                     CoorSet coorset1,
                     Monomer& monomer2,
                     CoorSet coorset2);
-            /*  Check if monomers within range to have non-zero pair potential */
 
+            /** Create list of monomers interacting with given monomer */
             monomerArrayT get_interacting_monomers(Monomer& monomer1,
                     CoorSet coorset1);
-            /*  Create list of monomers interacting with given */
 
+            /** Check if particles within range to have non-zero pair potential */
             bool particles_interacting(
                     Particle& particle1,
                     CoorSet coorset1,
                     Particle& particle2,
                     CoorSet coorset2);
-            /*  Check if particles within range to have non-zero pair potential */
 
+            /** Calculate pair energy between two particles.*/
             eneT calc_particle_pair_energy(
                     Particle& particle1,
                     CoorSet coorset1,
                     Particle& particle2,
                     CoorSet coorset2);
-            /*  Calculate pair energy between two particles.*/
 
         private:
             Config& m_config;

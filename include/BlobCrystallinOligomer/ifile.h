@@ -14,6 +14,7 @@
 
 namespace ifile {
 
+    using nlohmann::json;
     using shared_types::vecT;
     using shared_types::distT;
     using shared_types::stepT;
@@ -22,14 +23,13 @@ namespace ifile {
     using std::string;
     using std::vector;
 
-    typedef nlohmann::json json;
-
+    /** Convert a 3D json vector to an eigen vector.
+      *
+      * Probably a better way to do this than having a custom function
+      */
     vecT json2vec(json jvec);
-    /*  Convert a 3D json vector to an eigen vector.
 
-        Probably a better way to do this than having a custom function
-    */
-
+    /** For passing particle data to the config class */
     struct ParticleData {
         int index;
         string domain;
@@ -40,13 +40,14 @@ namespace ifile {
         vecT patch_orient;
     };
 
+    /** For passing monomer data to the config class */
     struct MonomerData {
         int index;
         vector<ParticleData> particles;
     };
 
+    /** JSON file format for input topology and configuration */
     class InputConfigFile {
-        /*  JSON file format for input topology and configuration */
         public:
             InputConfigFile(string filename);
             vector<MonomerData> get_monomers();
@@ -63,6 +64,7 @@ namespace ifile {
 
     };
 
+    /** For passing potential data to the energy class */
     struct PotentialData {
         string form;
         int index;
@@ -75,13 +77,14 @@ namespace ifile {
         double rcut;
     };
 
+    /** For passing interaction pair type data to the energy class */
     struct InteractionData {
         vector<pair<int, int>> particle_pairs;
         int potential_index;
     };
 
+    /** JSON file format for input energy specifications */
     class InputEnergyFile {
-        /*  JSON file format for input energy specifications */
         public:
             InputEnergyFile(string filename);
             vector<PotentialData> get_potentials();

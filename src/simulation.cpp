@@ -1,30 +1,16 @@
 // simulation.cpp
 
 #include <iostream>
-#include <memory>
 
-#include "BlobCrystallinOligomer/config.h"
-#include "BlobCrystallinOligomer/energy.h"
-#include "BlobCrystallinOligomer/movetype.h"
-#include "BlobCrystallinOligomer/ofile.h"
-#include "BlobCrystallinOligomer/param.h"
-#include "BlobCrystallinOligomer/random_gens.h"
 #include "BlobCrystallinOligomer/simulation.h"
 
 namespace simulation {
 
-    using config::Config;
-    using energy::Energy;
     using movetype::RotationVMMCMovetype;
     using movetype::TranslationVMMCMovetype;
     using movetype::NTDFlipMCMovetype;
-    using ofile::OutputConfigsFile;
-    using param::InputParams;
-    using random_gens::RandomGens;
-    using shared_types::stepT;
     using std::cout;
     using std::setw;
-    using std::unique_ptr;
 
     NVTMCSimulation::NVTMCSimulation(Config& conf, Energy& ene,
             InputParams params, RandomGens& random_num):
@@ -54,7 +40,7 @@ namespace simulation {
 
             // Output configuration and order parameters
             if (m_config_output_freq and step % m_config_output_freq == 0) {
-                m_config_file.write_timestep(m_config, step);
+                m_config_file.write_step(m_config, step);
             }
             //if (m_op_output_freq and step % m_op_output_freq) {
                 // Write op to file

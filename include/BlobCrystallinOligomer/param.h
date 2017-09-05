@@ -14,6 +14,10 @@ namespace param {
     using shared_types::stepT;
     using std::string;
 
+    /** Parse fractions in strings
+      *
+      * E.g., "3/4"
+      */
     class Fraction {
         public:
             Fraction(string unparsed_fraction);
@@ -25,6 +29,7 @@ namespace param {
     };
 
 
+    /** Input parameters from file */
     class InputParams {
         public:
             InputParams(int argc, char* argv[]);
@@ -56,8 +61,8 @@ namespace param {
             string m_translation_vmmc_raw;
             string m_ntd_flip_raw;
 
-            void post_process_inputs();
             /*  Process inputs that require more than default constructor */
+            void post_process_inputs();
     };
 }
 

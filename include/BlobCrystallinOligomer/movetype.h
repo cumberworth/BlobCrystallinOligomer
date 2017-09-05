@@ -34,14 +34,22 @@ namespace movetype {
     using std::string;
     using std::vector;
 
+    /** Return a unit vector with uniform distrition across sphere surface */
     vecT random_unit_vector(RandomGens& random_num);
+
+    /** Return uniform random distance between -max_disp and max_disp
+      *
+      * Range is [-max_disp, max_disp)
+      */
     distT random_displacement(distT max_disp, RandomGens& random_num);
 
+    /** General movetype interface */
     class MCMovetype {
-        // MC movetype interface
         public:
             MCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
                     InputParams params);
+
+            /** Attempt move and return result (accepted or rejectd) */
             virtual bool move() = 0;
             virtual string label() {return "MCMovetype";}
 
@@ -52,6 +60,12 @@ namespace movetype {
             eneT m_beta;
     };
 
+    /** Flip the NTD conformation
+      *
+      * There are two available conformations for the NTD. This movetype will
+      * attempts to flip the conformation via reflection in a plane of a
+      * randomly selected monomer.
+      */
     class NTDFlipMCMovetype: public MCMovetype {
         public:
             using MCMovetype::MCMovetype;
@@ -59,6 +73,7 @@ namespace movetype {
             string label() {return "NTDFlipMCMovetype";}
     };
 
+    /** Shared implementation for virtual moves */
     class VMMCMovetype: public MCMovetype {
         public:
             using MCMovetype::MCMovetype;
@@ -84,6 +99,7 @@ namespace movetype {
             void reset_internal();
     };
 
+    /** Translational virtual movetype */
     class TranslationVMMCMovetype: public VMMCMovetype {
         public:
             TranslationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
@@ -97,6 +113,7 @@ namespace movetype {
             vecT m_disp_v;
     };
 
+    /** Rotational virtual movetype */
     class RotationVMMCMovetype: public VMMCMovetype {
         public:
             RotationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,

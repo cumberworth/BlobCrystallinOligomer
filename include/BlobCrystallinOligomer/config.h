@@ -33,6 +33,11 @@ namespace config {
 
     typedef vector<reference_wrapper<Monomer>> monomerArrayT;
 
+    /** System configuration container
+      *
+      * Holds all monomer objects and provides an interface for configuration
+      * properties. Responsible for constructing monomers given monomer data.
+      */
     class Config {
         public:
             Config(InputParams params, RandomGens& random_num);
@@ -41,30 +46,36 @@ namespace config {
 
             Monomer& get_monomer(int monomer_index);
 
+            /**  Draw monomer with uniform probability */
             Monomer& get_random_monomer();
-            /*  Draw monomer with uniform probability */
             
+            /** Get all monomers in system */
             monomerArrayT get_monomers();
 
             int get_num_particles();
 
+            /** This assumes cuboid geometry */
             distT get_box_len();
 
+            /** The radius of a single bead of a monomer
+              *
+              * Assumes only only bead size.
+              */
             distT get_radius();
 
+            /** Calculate vector from particle 1 to particle 2 */
             vecT calc_interparticle_vector(
                     Particle& particle1,
                     CoorSet coorset1,
                     Particle& particle2,
                     CoorSet coorset2);
-            /*  Calculate vector from particle 1 to particle 2 */
 
+            /** Calculate distance between two particles */
             distT calc_dist(
                     Particle& particle1,
                     CoorSet coorset1,
                     Particle& particle2,
                     CoorSet coorset2);
-            /*  Calculate distance between two particles */
 
         private:
             vector<unique_ptr<Monomer>> m_monomers;

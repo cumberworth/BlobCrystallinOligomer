@@ -14,19 +14,12 @@
 
 namespace movetype {
 
-    using config::monomerArrayT;
     using Eigen::AngleAxis;
-    using monomer::Monomer;
-    using param::InputParams;
-    using shared_types::distT;
-    using shared_types::eneT;
     using shared_types::inf;
-    using shared_types::vecT;
     using shared_types::CoorSet;
     using std::exp;
     using std::fmin;
     using std::fmax;
-    using std::vector;
     using std::find;
 
     vecT random_unit_vector(RandomGens& random_num) {
@@ -77,7 +70,7 @@ namespace movetype {
                 continue;
             }
             eneT ene_3 {m_energy.calc_monomer_pair_energy(monomer1,
-                    CoorSet::trial, monomer2, CoorSet::current)};
+                    CoorSet::trial, monomer2, CoorSet::current)}; // HOW IS THIS DIFFERENT FROM 2???
             double prelink_rev_p {calc_prelink_prob(ene_1, ene_3)};
             bool link_accepted {accept_link(prelink_for_p, prelink_rev_p)};
             if (not link_accepted) {

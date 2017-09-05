@@ -29,6 +29,7 @@ namespace simulation {
     using std::string;
     using std::vector;
 
+    /** Simulation interface */
     class MCSimulation {
         public:
             virtual ~MCSimulation();
@@ -37,6 +38,8 @@ namespace simulation {
 
     // Eventually migrate much of this to a more general class if other simulation
     // method classes are to be designed
+
+    /** Canonical ensemble simulation */
     class NVTMCSimulation {
         public:
             NVTMCSimulation(

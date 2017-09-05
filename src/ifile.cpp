@@ -6,15 +6,11 @@
 #include "Json/json.hpp"
 
 #include "BlobCrystallinOligomer/ifile.h"
-#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace ifile {
 
-    using nlohmann::json;
-    using shared_types::distT;
     using shared_types::CoorSet;
     using std::ifstream;
-    using std::string;
 
     vecT json2vec(json jvec) {
         vector<distT> vec;

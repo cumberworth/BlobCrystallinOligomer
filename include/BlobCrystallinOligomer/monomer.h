@@ -27,31 +27,35 @@ namespace monomer {
 
     // Consider making multiple classes for different versions of the alphaB
     // monomer model, or in the distant future, alphaA monomers
+
+    /** alphB cyrstallin coarse grained monomer
+      *
+      * Contains the particles that make it up and an interface for manipulating
+      * the configuration.
+      */
     class Monomer {
         public:
             Monomer(MonomerData m_data, CuboidPBC& pbc_space);
 
-            // Accessors
+            /** Unique index */
             int get_index();
-            /*  Unique index */
 
+            /** Get all particles */
             particleArrayT get_particles();
-            /*  Get all particles */
 
             int get_num_particles();
 
+            /** Get geometric center of all particles */
             vecT get_center();
-            /* Get geometric center of all particles */
 
-            // Configuration manipulation
+            /** Translate monomer by given vector */
             void translate(vecT disv);
-            /*  Translate monomer by given vector */
 
+            /** Rotate monomer by given ? around given origin */
             void rotate(vecT rot_c, rotMatT rot_mat);
-            /*  Rotate monomer by given ? around given origin */
 
+            /** Make trial configuration current configuration */
             void trial_to_current();
-            /*  Make trial configuration current configuration */
 
         private:
             int m_index; // Unique monomer index

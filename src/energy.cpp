@@ -3,32 +3,19 @@
 #include <memory>
 #include <vector>
 
-#include "BlobCrystallinOligomer/config.h"
 #include "BlobCrystallinOligomer/energy.h"
-#include "BlobCrystallinOligomer/param.h"
-#include "BlobCrystallinOligomer/potential.h"
-#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace energy {
 
-    using config::Config;
-    using config::monomerArrayT;
     using ifile::InputEnergyFile;
-    using ifile::InteractionData;
-    using ifile::PotentialData;
-    using monomer::Monomer;
     using monomer::particleArrayT;
-    using param::InputParams;
     using potential::HardSpherePotential;
     using potential::ShiftedLJPotential;
     using potential::PatchyPotential;
     using potential::OrientedPatchyPotential;
-    using shared_types::CoorSet;
     using shared_types::distT;
     using shared_types::inf;
     using shared_types::vecT;
-    using std::shared_ptr;
-    using std::vector;
 
     Energy::Energy(Config& conf, InputParams params):
             m_config {conf} {

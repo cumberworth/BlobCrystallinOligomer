@@ -1,0 +1,7 @@
+*.swp
+.d/
+prereqs.txt
+.ycm_extra_conf.py*
+bin/
+build/
+examples/

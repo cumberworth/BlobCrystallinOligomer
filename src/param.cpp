@@ -7,16 +7,11 @@
 #include "boost/program_options.hpp"
 
 #include "BlobCrystallinOligomer/param.h"
-#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace param {
 
     namespace po = boost::program_options;
 
-    using shared_types::eneT;
-    using shared_types::distT;
-    using shared_types::stepT;
-    using std::string;
     using std::cout;
 
     Fraction::Fraction(string unparsed_fraction) {

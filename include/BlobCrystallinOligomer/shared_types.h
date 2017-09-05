@@ -16,6 +16,7 @@ namespace shared_types {
     typedef unsigned long long int stepT;
     const double inf {std::numeric_limits<double>::infinity()};
 
+    /** For specifying which particle coordinate set to use: current or trial */
     enum class CoorSet {
         current,
         trial

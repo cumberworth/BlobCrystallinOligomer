@@ -1,13 +1,8 @@
 // particle.cpp
 
 #include "BlobCrystallinOligomer/particle.h"
-#include "BlobCrystallinOligomer/shared_types.h"
-#include "BlobCrystallinOligomer/space.h"
 
 namespace particle {
-
-    using shared_types::CoorSet;
-    using space::CuboidPBC;
 
     Particle::Particle(int index, int type, vecT pos, Orientation ore,
             CuboidPBC& pbc_space):

@@ -1,14 +1,8 @@
 // random_gens.cpp
 
-#include <memory>
-#include <random>
-
 #include "BlobCrystallinOligomer/random_gens.h"
 
 namespace random_gens {
-
-    using std::uniform_int_distribution;
-    using std::unique_ptr;
 
     RandomGens::RandomGens() {
         std::random_device true_random_engine {}; 

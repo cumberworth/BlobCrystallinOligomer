@@ -4,25 +4,15 @@
 #include <vector>
 #include <iostream>
 
-#include "BlobCrystallinOligomer/ifile.h"
 #include "BlobCrystallinOligomer/monomer.h"
-#include "BlobCrystallinOligomer/particle.h"
-#include "BlobCrystallinOligomer/space.h"
 
 namespace monomer {
 
-    using ifile::MonomerData;
-    using ifile::ParticleData;
     using particle::Orientation;
     using particle::OrientedPatchyParticle;
-    using particle::Particle;
     using particle::PatchyParticle;
-    using space::CuboidPBC;
     using shared_types::CoorSet;
-    using shared_types::rotMatT;
     using std::cout;
-    using std::unique_ptr;
-    using std::vector;
 
     Monomer::Monomer(MonomerData m_data, CuboidPBC& pbc_space):
             m_index {m_data.index} {

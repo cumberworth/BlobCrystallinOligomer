@@ -5,27 +5,16 @@
 #include <utility>
 
 #include "BlobCrystallinOligomer/config.h"
-#include "BlobCrystallinOligomer/ifile.h"
-#include "BlobCrystallinOligomer/monomer.h"
-#include "BlobCrystallinOligomer/random_gens.h"
-#include "BlobCrystallinOligomer/shared_types.h"
 
 namespace config {
 
-    using ifile::InputConfigFile;
-    using ifile::MonomerData;
-    using ifile::ParticleData;
-    using monomer::Monomer;
-    using particle::Particle;
-    using random_gens::RandomGens;
-    using shared_types::vecT;
     using std::cout;
     using std::pair;
-    using std::unique_ptr;
     using std::make_unique;
 
     Config::Config(InputParams params, RandomGens& random_num):
-            m_space_store {new CuboidPBC()}, m_space {*m_space_store},
+            m_space_store {new CuboidPBC()},
+            m_space {*m_space_store},
             m_random_num {random_num} {
 
         InputConfigFile config_file {params.m_config_filename};

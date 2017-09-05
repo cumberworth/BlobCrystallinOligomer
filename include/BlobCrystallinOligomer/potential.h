@@ -13,28 +13,41 @@ namespace potential {
     using shared_types::eneT;
     using shared_types::vecT;
 
-    // Should do a fast version that takes presquared values
+    /** Return value of Gaussian function */
     eneT guassian(distT theta, distT sig);
 
+    /** Interface and shared implementation to pair potentials */
     class PairPotential {
         public:
             PairPotential(distT rcut);
-            virtual eneT calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
+
+            /** Calculate pair potential */
+            virtual eneT calc_energy(
+                    distT rdist,
+                    vecT& p_diff,
+                    Orientation& ore1,
                     Orientation& ore2) = 0;
+
+            /** Check if pair potential is non-zero */
             bool particles_interacting(distT rdist);
 
         private:
             distT m_rcut;
     };
 
-    class HardSpherePotential: public PairPotential {
+    /** Hard sphere potential */
+    class HardSpherePotential:
+            public PairPotential {
+
         public:
             HardSpherePotential(distT sigh);
             eneT calc_energy(distT rdist, vecT&, Orientation&, Orientation&);
+
         private:
             distT m_sigh; // Sphere radius
     };
 
+    /** Shifted Lennard Jone potential */
     class ShiftedLJPotential: public PairPotential {
         public:
             ShiftedLJPotential(eneT eps, distT sigl, distT rcut);
@@ -48,6 +61,10 @@ namespace potential {
             eneT m_shift; // Shift
     };
 
+    /** Directional patch potential
+      *
+      * Taken from [doye paper]
+      */
     class PatchyPotential: public PairPotential {
         public:
             PatchyPotential(eneT eps, distT sigl, distT rcut, distT siga1,
@@ -61,6 +78,10 @@ namespace potential {
             distT m_siga2; // Patch width of particle 2
     };
 
+    /** Oriented patch potential
+      *
+      * Taken from [doye paper]
+      */
     class OrientedPatchyPotential: public PairPotential {
         public:
             OrientedPatchyPotential(eneT eps, distT sigl, distT rcut,
