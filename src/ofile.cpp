@@ -22,7 +22,7 @@ namespace ofile {
 
     void OutputConfigsFile::write_structure(Config& conf) {
         // This is a bit of a hack for the radius
-        m_file << "0" << ":" << conf.get_num_particles() << " ";
+        m_file << "0" << ":" << conf.get_num_particles() - 1 << " ";
         m_file << "radius " << conf.get_radius() << "\n";
         m_file << "\n";
         distT x {conf.get_box_len()};
