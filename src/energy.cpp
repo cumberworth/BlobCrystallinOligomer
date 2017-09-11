@@ -26,6 +26,21 @@ namespace energy {
         create_potentials(potentials, interactions);
     }
 
+    eneT Energy::calc_total_energy() {
+        monomerArrayT monomers {m_config.get_monomers()};
+        eneT total_ene {0};
+        for (size_t i {0}; i != monomers.size() - 1; i++) {
+            Monomer& monomer1 {monomers[i].get()};
+            for (size_t j {i + 1}; j != monomers.size(); j++) {
+                Monomer& monomer2 {monomers[j].get()};
+                total_ene += {calc_monomer_pair_energy(monomer1, CoorSet::current,
+                        monomer2, CoorSet::current)};
+            }
+        }
+
+        return total_ene;
+    }
+
     eneT Energy::calc_monomer_pair_energy(Monomer& monomer1, CoorSet coorset1,
             Monomer& monomer2, CoorSet coorset2) {
 
@@ -83,6 +98,7 @@ namespace energy {
 
     monomerArrayT Energy::get_interacting_monomers(Monomer& monomer1,
             CoorSet coorset1) {
+
         monomerArrayT monomers {m_config.get_monomers()};
         monomerArrayT interacting_monomers {};
         CoorSet coorset2 {CoorSet::current};

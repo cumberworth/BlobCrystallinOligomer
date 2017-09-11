@@ -88,6 +88,7 @@ namespace ifile {
             PotentialData pot_data {};
             pot_data.index = json_potential["index"];
             string pot_form {json_potential["form"].get<string>()};
+            pot_data.form = pot_form;
             if (pot_form == "HardSphere") {
                 pot_data.sigh = json_potential["parameters"]["sigh"];
             }

@@ -91,7 +91,7 @@ namespace movetype {
             void virtual apply_movemap(Monomer& monomer) = 0;
 
             void add_interacting_pairs(Monomer& monomer1);
-            pair<int, int> select_random_pair();
+            pair<int, int> pop_random_pair();
             double calc_prelink_prob(eneT ene1, eneT ene2);
             bool accept_prelink(double prelink_p);
             bool accept_link(double prelink_for_p, double prelink_rev_p);

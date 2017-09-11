@@ -47,6 +47,9 @@ namespace energy {
             Energy(Config& conf, vector<PotentialData>,
                     vector<InteractionData>);
 
+            /** Calculate total system energy */
+            eneT calc_total_energy();
+
             /** Calculate pair energy between two monomers */
             eneT calc_monomer_pair_energy(
                     Monomer& monomer1,

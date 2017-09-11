@@ -17,6 +17,7 @@ namespace movetype {
     using Eigen::AngleAxis;
     using shared_types::inf;
     using shared_types::CoorSet;
+    using std::cout;
     using std::exp;
     using std::fmin;
     using std::fmax;
@@ -57,7 +58,7 @@ namespace movetype {
         apply_movemap(monomer_seed);
         add_interacting_pairs(monomer_seed);
         while (m_pair_mis.size() != 0) {
-            pair<int, int> cur_pair {select_random_pair()};
+            pair<int, int> cur_pair {pop_random_pair()};
             Monomer& monomer1 {m_config.get_monomer(cur_pair.first)};
             Monomer& monomer2 {m_config.get_monomer(cur_pair.second)};
             eneT ene_1 {m_energy.calc_monomer_pair_energy(monomer1,
@@ -70,7 +71,7 @@ namespace movetype {
                 continue;
             }
             eneT ene_3 {m_energy.calc_monomer_pair_energy(monomer1,
-                    CoorSet::trial, monomer2, CoorSet::current)}; // HOW IS THIS DIFFERENT FROM 2???
+                    CoorSet::current, monomer2, CoorSet::trial)};
             double prelink_rev_p {calc_prelink_prob(ene_1, ene_3)};
             bool link_accepted {accept_link(prelink_for_p, prelink_rev_p)};
             if (not link_accepted) {
@@ -99,40 +100,46 @@ namespace movetype {
     }
 
     void VMMCMovetype::add_interacting_pairs(Monomer& monomer1) {
+
+        // Get all monomers that are interacting before and after application of
+        // movemap to seed
         monomerArrayT monomers {m_energy.get_interacting_monomers(monomer1,
                 CoorSet::current)};
         monomerArrayT trial_monomers {m_energy.get_interacting_monomers(monomer1,
                 CoorSet::trial)};
         monomers.insert(monomers.end(), trial_monomers.begin(),
                 trial_monomers.end());
+
+        // Find all unique pairs of interacting monomers
+        // TODO figure out about checking pair in either order
         set<int> unique_mis {};
         for (Monomer& mono: monomers) {
             int mono_i2 {mono.get_index()};
             auto insert_result {unique_mis.insert(mono_i2)};
             if (insert_result.second) {
+
+                // Monomers may be involved in other pairings in the network;
+                // only apply the movemap once
                 insert_result = m_interacting_mis.insert(mono_i2);
-                if (not insert_result.second) {
+                if (insert_result.second) {
                     apply_movemap(mono);
                 }
-            pair<int, int> pair_mis;
-            int mono_i1 {monomer1.get_index()};
-            if (mono_i2 > mono_i1) {
-                pair_mis = {mono_i1, mono_i2};
-            }
-            else {
-                pair_mis = {mono_i2, mono_i1};
-            }
-            m_pair_mis.insert(pair_mis);
+
+                int mono_i1 {monomer1.get_index()};
+                pair<int, int> pair_mis {mono_i1, mono_i2};
+                m_pair_mis.insert(pair_mis);
             }
         }
     }
 
-    pair<int, int> VMMCMovetype::select_random_pair() {
-        int pair_i {m_random_num.uniform_int(0, m_pair_mis.size())};
+    pair<int, int> VMMCMovetype::pop_random_pair() {
+        int pair_i {m_random_num.uniform_int(0, m_pair_mis.size() - 1)};
         set<pair<int, int>>::const_iterator it {m_pair_mis.begin()};
         std::advance(it, pair_i);
+        pair<int, int> sel_pair {*it};
+        m_pair_mis.erase(it);
 
-        return *it;
+        return sel_pair;
     }
 
     double VMMCMovetype::calc_prelink_prob(eneT ene1, eneT ene2) {
