@@ -95,12 +95,21 @@ namespace ifile {
             if (pot_form == "ShiftedLJ") {
                 pot_data.sigl = json_potential["parameters"]["sigl"];
                 pot_data.eps = json_potential["parameters"]["eps"];
+                pot_data.rcut = json_potential["parameters"]["rcut"];
             }
             if (pot_form == "Patchy") {
+                pot_data.sigl = json_potential["parameters"]["sigl"];
+                pot_data.eps = json_potential["parameters"]["eps"];
+                pot_data.rcut = json_potential["parameters"]["rcut"];
                 pot_data.siga1 = json_potential["parameters"]["siga1"];
                 pot_data.siga2 = json_potential["parameters"]["siga2"];
             }
             if (pot_form == "OrientedPatchy") {
+                pot_data.sigl = json_potential["parameters"]["sigl"];
+                pot_data.eps = json_potential["parameters"]["eps"];
+                pot_data.rcut = json_potential["parameters"]["rcut"];
+                pot_data.siga1 = json_potential["parameters"]["siga1"];
+                pot_data.siga2 = json_potential["parameters"]["siga2"];
                 pot_data.sigt = json_potential["parameters"]["sigt"];
             }
             m_potentials.push_back(pot_data);
