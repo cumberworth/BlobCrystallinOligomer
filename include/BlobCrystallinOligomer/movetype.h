@@ -84,6 +84,7 @@ namespace movetype {
             monomerArrayT m_cluster;
             int m_frustrated_links {0};
             vector<int> m_frustrated_mis {};
+            set<pair<int, int>> m_proposed_pairs {};
             set<int> m_interacting_mis;
             set<pair<int, int>> m_pair_mis;
 

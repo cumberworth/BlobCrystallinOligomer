@@ -101,8 +101,7 @@ namespace movetype {
 
     void VMMCMovetype::add_interacting_pairs(Monomer& monomer1) {
 
-        // Get all monomers that are interacting before and after application of
-        // movemap to seed
+        // Get all monomers that are interacting before and after application of movemap
         monomerArrayT monomers {m_energy.get_interacting_monomers(monomer1,
                 CoorSet::current)};
         monomerArrayT trial_monomers {m_energy.get_interacting_monomers(monomer1,
@@ -110,25 +109,35 @@ namespace movetype {
         monomers.insert(monomers.end(), trial_monomers.begin(),
                 trial_monomers.end());
 
-        // Find all unique pairs of interacting monomers
-        // TODO figure out about checking pair in either order
-        set<int> unique_mis {};
         for (Monomer& mono: monomers) {
+
+            // The second monomer should not already be in the cluster
             int mono_i2 {mono.get_index()};
-            auto insert_result {unique_mis.insert(mono_i2)};
-            if (insert_result.second) {
-
-                // Monomers may be involved in other pairings in the network;
-                // only apply the movemap once
-                insert_result = m_interacting_mis.insert(mono_i2);
-                if (insert_result.second) {
-                    apply_movemap(mono);
+            bool mono_in_cluster {false};
+            for (auto mono: m_cluster) {
+                if (mono_i2 == mono.get().get_index()) {
+                    mono_in_cluster = true;
+                    break;
                 }
-
-                int mono_i1 {monomer1.get_index()};
-                pair<int, int> pair_mis {mono_i1, mono_i2};
-                m_pair_mis.insert(pair_mis);
             }
+            if (mono_in_cluster) {
+                continue;
+            }
+
+            // The pair should not have been proposed before
+            int mono_i1 {monomer1.get_index()};
+            pair<int, int> pair_mis {mono_i1, mono_i2};
+            auto proposed {not m_proposed_pairs.insert(pair_mis).second};
+            if (proposed) {
+                continue;
+            }
+
+            // Only apply the movemap once
+            bool movemap_applied {not m_interacting_mis.insert(mono_i2).second};
+            if (not movemap_applied) {
+                apply_movemap(mono);
+            }
+            m_pair_mis.insert(pair_mis);
         }
     }
 
@@ -200,6 +209,7 @@ namespace movetype {
         m_cluster.clear();
         m_frustrated_links = 0;
         m_frustrated_mis.clear();
+        m_proposed_pairs.clear();
         m_interacting_mis.clear();
         m_pair_mis.clear();
     }
