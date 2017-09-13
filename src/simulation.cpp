@@ -99,8 +99,9 @@ namespace simulation {
 
     void NVTMCSimulation::log_move(stepT step, string label, bool accepted) {
         cout << "Step: " << step << "\n";
-        cout << "Movetype : " << label << "\n";
-        cout << "Accepted : " << accepted << "\n";
+        cout << "Movetype: " << label << "\n";
+        cout << "Accepted: " << accepted << "\n";
+        cout << "Energy: " << m_energy.calc_total_energy() << "\n";
         cout << "\n";
     }
 
@@ -114,8 +115,8 @@ namespace simulation {
             cout << m_movetypes[i]->label() << setw(10);
             cout << m_move_attempts[i] << setw(10);
             cout << m_move_accepts[i] << setw(10);
-            cout << static_cast<double>(m_move_attempts[i]) /
-                    m_move_accepts[i] << "\n";
+            cout << static_cast<double>(m_move_accepts[i]) /
+                    m_move_attempts[i] << "\n";
         }
     }
 }
