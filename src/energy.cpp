@@ -15,7 +15,9 @@ namespace energy {
     using potential::OrientedPatchyPotential;
     using shared_types::distT;
     using shared_types::inf;
+    using shared_types::InputError;
     using shared_types::vecT;
+    using std::cout;
 
     Energy::Energy(Config& conf, InputParams params):
             m_config {conf} {
@@ -24,6 +26,10 @@ namespace energy {
         vector<PotentialData> potentials {energy_file.get_potentials()};
         vector<InteractionData> interactions {energy_file.get_interactions()};
         create_potentials(potentials, interactions);
+        if (calc_total_energy() == inf) {
+            cout << "Bad starting configuration\n";
+            throw InputError {};
+        }
     }
 
     eneT Energy::calc_total_energy() {
