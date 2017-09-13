@@ -6,3 +6,4 @@ prereqs.txt
 bin/
 build/
 localtests/
+*__pycache__/

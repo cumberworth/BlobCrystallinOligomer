@@ -4,22 +4,64 @@ Some parallels to the classes used in the C++ implementation, but should not
 assume the structure is the same. These classes are meant to be used in analysis
 scripts and file conversions.
 
-The altentaive is wrapping the relevant parts of the C++ version in cython,
+The alternative is wrapping the relevant parts of the C++ version in cython,
 which is probably more work.
 """
 
 import json
 import string
-import transforms3d.affines as affines
 
 import numpy as np
+import transforms3d.affines as affines
+
+
+def hard_sphere_overlap(new_monomer, monomers, diameter, space):
+    """Check for overlap between new hard sphere and system of hard spheres"""
+    overlap = False
+    new_particles = new_monomer.particles
+    for old_monomer in monomers:
+        for i in range(len(new_particles)):
+            new_pos = new_particles[i].pos
+            old_particles = old_monomer.particles
+            for j in range(i, len(old_particles)):
+                old_pos = old_particles[j].pos
+                if space.calc_dist(new_pos, old_pos) < diameter:
+                    overlap = True
+                    return overlap
+
+    return overlap
+
+
+class CuboidPBC:
+    """Cuboid periodic boundary conditions"""
+
+    def __init__(self, box_len):
+        self.r = box_len / 2
+
+    def calc_diff(self, pos1, pos2):
+        diff = np.zeros(3)
+        for i in range(3):
+            comp_diff = pos2[i] - pos1[i]
+            if comp_diff > self.r:
+                comp_diff = -2*self.r + comp_diff
+            elif comp_diff < -self.r:
+                comp_diff = 2*self.r + comp_diff;
+
+            diff[i] = comp_diff;
+
+        return diff;
+
+    def calc_dist(self, pos1, pos2):
+        return np.linalg.norm(self.calc_diff(pos1, pos2))
 
 
 class Monomer:
     """General monomer class"""
 
-    def __init__(self):
+    def __init__(self, particles, index):
         self._cur_i = -1 # For iterating over contained particles
+        self._num_particles = len(particles)
+        self._particles = particles
 
     # Following two functions are iterator protocol to allow iteration over
     # particles.
@@ -34,9 +76,29 @@ class Monomer:
         else:
             return (self._particles)[self._cur_i]
 
+    @property
+    def center(self):
+        center = np.zeros(4)
+        for particle in self:
+            center += particle.pos
+
+        center /= self._num_particles
+
+        return center
+
+    @property
+    def particles(self):
+        return self._particles
+
+    def apply_transformation(self, M):
+        """Apply the transformation matrix to all position vectors."""
+
+        for particle in self:
+            particle.apply_transformation(M)
+
 
 class SingleParticleMonomer(Monomer):
-    """Hard sphere monomer."""
+    """Single particle monomer."""
 
     def __init__(self, particles, radius, index):
         self._particles = particles
@@ -66,7 +128,7 @@ class SingleParticleMonomer(Monomer):
 class AlphaBMonomer(Monomer):
     """Coarse-grain AlphaB crystallin monomer.
 
-    Contains ACD partilces and NTD particles . ACDs protrude from origin with NTD
+    Contains ACD particles and NTD particles. ACDs protrude from origin with NTD
     extending in positive z.
     """
 
@@ -118,27 +180,11 @@ class AlphaBMonomer(Monomer):
 
         return center
 
-    @property
-    def center(self):
-        center = np.zeros(4)
-        for particle in self:
-            center += particle.pos
-
-        center /= self._num_particles
-
-        return center
-
-    def apply_transformation(self, M):
-        """Apply the transformation matrix to all position vectors."""
-
-        for particle in self:
-            particle.apply_transformation(M)
-
 
 class SimpleParticle:
     """Spherical particle.
 
-    Defaults to homogenous coordinates."""
+    Defaults to homogeneous coordinates."""
 
     def __init__(self, index, domain, type, pos=None):
         self._index = index # Unique particle index
@@ -341,11 +387,12 @@ class JSONConfigOutputFile:
     def __init__(self, filename):
         self._filename = filename
 
-    def write(self, monomers):
+    def write(self, monomers, box_len):
         """Write json format of coarse-grained alphaB crystallin model."""
         cgmonomer_json = {}
         cgmonomer_json['cgmonomer'] = {'config': []}
         cgmonomer_json['cgmonomer']['radius'] = monomers[0].radius
+        cgmonomer_json['cgmonomer']['box_len'] = box_len
         for monomer in monomers:
             monomer_json = {}
             monomer_json['index'] = monomer.index
