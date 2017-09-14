@@ -52,8 +52,12 @@ namespace potential {
 
     eneT ShiftedLJPotential::calc_energy(distT rdist, vecT&, Orientation&,
             Orientation&) {
-        distT sig_r_ratio {m_sigl/rdist};
+
         eneT ene;
+        if (rdist >= m_rcut) {
+            ene = 0;
+        }
+        distT sig_r_ratio {m_sigl/rdist};
         ene = m_four_eps*(pow(sig_r_ratio, 12) - pow(sig_r_ratio, 6)) - m_shift;
 
         return ene;
