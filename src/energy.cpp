@@ -146,15 +146,15 @@ namespace energy {
                 pot = new  HardSpherePotential {p_data.sigh};
             }
             else if (p_data.form == "ShiftedLJ") {
-                pot = new ShiftedLJPotential {p_data.sigl, p_data.eps,
+                pot = new ShiftedLJPotential {p_data.eps, p_data.sigl,
                         p_data.rcut};
             }
             else if (p_data.form == "Patchy") {
-                pot = new PatchyPotential {p_data.sigl, p_data.eps, p_data.rcut,
+                pot = new PatchyPotential {p_data.eps, p_data.sigl, p_data.rcut,
                         p_data.siga1, p_data.siga2};
             }
             else if (p_data.form == "OrientedPatchy") {
-                pot = new OrientedPatchyPotential {p_data.sigl, p_data.eps,
+                pot = new OrientedPatchyPotential {p_data.eps, p_data.sigl,
                         p_data.rcut, p_data.siga1, p_data.siga2,
                         p_data.sigt};
             }
