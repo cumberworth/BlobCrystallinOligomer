@@ -23,19 +23,19 @@ namespace ofile {
 
     typedef nlohmann::json json;
 
-    /** JSON file format for single configuration output */
-    class OutputConfigFile {
+    class OutputFile {
+        public:
+            OutputFile();
+            OutputFile(string filename);
+            std::ofstream m_file;
     };
 
-    /** VTF/Tcl file format for "trajectory" configuration output
-      *
-      * The VTF format allows the particle positions to be read by VMD.
-      * However, it cannot read patch vectors, so these are written to a Tcl
-      * script.
-      */
-    class OutputConfigsFile {
+    /** VSF file format for topology output */
+    class VSFOutputFile:
+            virtual private OutputFile {
         public:
-            OutputConfigsFile(string filename, Config& conf);
+            VSFOutputFile();
+            VSFOutputFile(string filename, Config& conf);
 
             /** Write system properties and topology.
               *
@@ -43,11 +43,45 @@ namespace ofile {
               */
             void write_structure(Config& conf);
 
+        private:
+            std::ofstream m_file;
+    };
+
+    /** VCF file format for position frame output */
+    class VCFOutputFile:
+            virtual private OutputFile {
+        public:
+            VCFOutputFile();
+            VCFOutputFile(string filename);
+
             /** Write configuration at current step */
             void write_step(Config& config, stepT step);
 
         private:
+    };
+
+    /** VTF file format for topology and position frame output */
+    class VTFOutputFile: 
+            public VSFOutputFile,
+            public VCFOutputFile,
+            virtual private OutputFile {
+        public:
+            VTFOutputFile(string filename, Config& conf);
+
+        private:
             std::ofstream m_file;
+    };
+
+    /** Simple output format for patch vectors
+      *
+      * All patch vectors for a given frame are written on one line. All vectors
+      * for a given particle are written consecutively.
+      */
+    class PatchOutputFile:
+            virtual private OutputFile {
+        public:
+            PatchOutputFile(string filename);
+            void write_step(Config& conf);
     };
 }
 

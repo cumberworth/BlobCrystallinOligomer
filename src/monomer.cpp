@@ -72,6 +72,7 @@ namespace monomer {
 
     void Monomer::create_particles(vector<ParticleData> p_datas,
             CuboidPBC& pbc_space) {
+
         for (auto p_data: p_datas) {
             int type {p_data.type};
             Particle* part;
