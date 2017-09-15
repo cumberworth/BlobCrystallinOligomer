@@ -6,7 +6,12 @@ namespace particle {
 
     Particle::Particle(int index, int type, vecT pos, Orientation ore,
             CuboidPBC& pbc_space):
-            m_ore {ore}, m_index {index}, m_type {type}, m_pos {pos},
+            m_ore {ore},
+            m_trial_ore {ore},
+            m_index {index},
+            m_type {type},
+            m_pos {pos},
+            m_trial_pos {pos},
             m_space {pbc_space} {
     }
 
