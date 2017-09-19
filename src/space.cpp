@@ -25,7 +25,7 @@ namespace space {
     vecT CuboidPBC::calc_diff(vecT pos1, vecT pos2) {
         vecT diff;
         for (int i {0}; i != 3; i++) {
-            distT comp_diff {pos2[i] - pos1[i]};
+            distT comp_diff {pos1[i] - pos2[i]};
             if (comp_diff > m_r) {
                 comp_diff = -2*m_r + comp_diff;
             }
