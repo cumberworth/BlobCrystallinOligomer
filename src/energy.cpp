@@ -26,7 +26,8 @@ namespace energy {
         vector<PotentialData> potentials {energy_file.get_potentials()};
         vector<InteractionData> interactions {energy_file.get_interactions()};
         create_potentials(potentials, interactions);
-        if (calc_total_energy() == inf) {
+        eneT total_ene {calc_total_energy()};
+        if (total_ene == inf or total_ene != total_ene) {
             cout << "Bad starting configuration\n";
             throw InputError {};
         }
