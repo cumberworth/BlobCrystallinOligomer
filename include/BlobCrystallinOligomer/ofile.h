@@ -23,16 +23,22 @@ namespace ofile {
 
     typedef nlohmann::json json;
 
+    /** Base class for output files */
     class OutputFile {
         public:
             OutputFile();
             OutputFile(string filename);
+            virtual ~OutputFile() {}
+            void close();
+
+        protected:
             std::ofstream m_file;
+            string m_filename;
     };
 
     /** VSF file format for topology output */
     class VSFOutputFile:
-            virtual private OutputFile {
+            virtual public OutputFile {
         public:
             VSFOutputFile();
             VSFOutputFile(string filename, Config& conf);
@@ -42,34 +48,28 @@ namespace ofile {
               * For now this is just the box size and the particle radii
               */
             void write_structure(Config& conf);
-
-        private:
-            std::ofstream m_file;
     };
 
     /** VCF file format for position frame output */
     class VCFOutputFile:
-            virtual private OutputFile {
+            virtual public OutputFile {
         public:
             VCFOutputFile();
             VCFOutputFile(string filename);
 
             /** Write configuration at current step */
             void write_step(Config& config, stepT step);
-
-        private:
+            void open_write_step_close(Config& config, stepT step);
     };
 
     /** VTF file format for topology and position frame output */
     class VTFOutputFile: 
             public VSFOutputFile,
             public VCFOutputFile,
-            virtual private OutputFile {
+            virtual public OutputFile {
         public:
             VTFOutputFile(string filename, Config& conf);
-
-        private:
-            std::ofstream m_file;
+            void open_write_close(Config& config, stepT step);
     };
 
     /** Simple output format for patch vectors
@@ -78,10 +78,11 @@ namespace ofile {
       * for a given particle are written consecutively.
       */
     class PatchOutputFile:
-            virtual private OutputFile {
+            virtual public OutputFile {
         public:
             PatchOutputFile(string filename);
             void write_step(Config& conf);
+            void open_write_step_close(Config& conf);
     };
 }
 

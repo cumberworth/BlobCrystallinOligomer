@@ -74,6 +74,7 @@ namespace potential {
 
         private:
             ShiftedLJPotential m_lj; // Radial component
+            distT m_sigl;
             distT m_siga1; // Patch width of particle 1
             distT m_siga2; // Patch width of particle 2
     };
@@ -91,6 +92,7 @@ namespace potential {
 
         private:
             PatchyPotential m_patchy; // Unoriented-patchy potential
+            distT m_sigl;
             distT m_sigt; // Orientation width
     };
 }

@@ -21,8 +21,7 @@ namespace simulation {
     using config::Config;
     using energy::Energy;
     using movetype::MCMovetype;
-    using ofile::VSFOutputFile;
-    using ofile::VCFOutputFile;
+    using ofile::VTFOutputFile;
     using ofile::PatchOutputFile;
     using random_gens::RandomGens;
     using shared_types::eneT;
@@ -67,9 +66,10 @@ namespace simulation {
             stepT m_config_output_freq;
             stepT m_op_output_freq;
 
-            VSFOutputFile m_vsf_file;
-            VCFOutputFile m_vcf_file;
+            VTFOutputFile m_vtf_file;
             PatchOutputFile m_patch_file;
+            VTFOutputFile m_pipe_vtf_file;
+            PatchOutputFile m_pipe_patch_file;
 
             void construct_movetypes(InputParams params);
             void setup_output_files(InputParams params);

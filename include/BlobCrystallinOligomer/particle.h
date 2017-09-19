@@ -18,8 +18,8 @@ namespace particle {
       * Explicity stores the current configuration of the patch vectors
       */
     struct Orientation {
-        vecT patch_norm;
-        vecT patch_orient;
+        vecT patch_norm {0, 0, 0};
+        vecT patch_orient {0, 0, 0};
     };
 
     /** General class for particles, the basic building blocks of structures
