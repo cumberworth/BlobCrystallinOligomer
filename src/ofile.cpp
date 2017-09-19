@@ -18,7 +18,12 @@ namespace ofile {
     }
 
     OutputFile::OutputFile(string filename):
-            m_file {filename} {
+            m_file {filename},
+            m_filename {filename} {
+    }
+
+    void OutputFile::close() {
+        m_file.close();
     }
 
     VSFOutputFile::VSFOutputFile() {
@@ -32,8 +37,16 @@ namespace ofile {
 
     void VSFOutputFile::write_structure(Config& conf) {
         // This is a bit of a hack for the radius
-        m_file << "0" << ":" << conf.get_num_particles() - 1 << " ";
-        m_file << "radius " << conf.get_radius() << "\n";
+        int i {0};
+        for (auto m: conf.get_monomers()) {
+            for (auto p: m.get().get_particles()) {
+                m_file << "atom " << i << " ";
+                m_file << "type " << p.get().get_type() << " ";
+                m_file << "resid " << m.get().get_index() << " ";
+                m_file << "radius " << conf.get_radius() << "\n";
+                i++;
+            }
+        }
         m_file << "\n";
         distT x {conf.get_box_len()};
         m_file << "pbc " << x << " " << x << " " << x << "\n";
@@ -58,10 +71,23 @@ namespace ofile {
         m_file << "\n";
     }
 
+    void VCFOutputFile::open_write_step_close(Config& conf, stepT step) {
+        m_file.open(m_filename);
+        write_step(conf, step);
+        m_file.close();
+    }
+
     VTFOutputFile::VTFOutputFile(string filename, Config& conf):
             OutputFile {filename} {
 
          write_structure(conf);
+    }
+
+    void VTFOutputFile::open_write_close(Config& conf, stepT step) {
+        m_file.open(m_filename);
+        write_structure(conf);
+        write_step(conf, step);
+        m_file.close();
     }
 
     PatchOutputFile::PatchOutputFile(string filename):
@@ -81,5 +107,11 @@ namespace ofile {
             }
         }
         m_file << "\n";
+    }
+
+    void PatchOutputFile::open_write_step_close(Config& conf) {
+        m_file.open(m_filename);
+        write_step(conf);
+        m_file.close();
     }
 }

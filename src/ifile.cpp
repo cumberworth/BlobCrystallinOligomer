@@ -53,7 +53,8 @@ namespace ifile {
                 vecT pos {json2vec(json_particle["pos"])};
                 vecT patch_norm;
                 vecT patch_orient;
-                if (p_form == "PatchyParticle") {
+                if (p_form == "PatchyParticle" or p_form == 
+                        "OrientedPatchyParticle") {
                     patch_norm = json2vec(json_particle["patch_norm"]);
                 }
                 if (p_form == "OrientedPatchyParticle") {

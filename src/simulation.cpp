@@ -19,10 +19,13 @@ namespace simulation {
             m_logging_freq {params.m_logging_freq},
             m_config_output_freq {params.m_config_output_freq},
             m_op_output_freq {params.m_op_output_freq},
-            m_vsf_file {params.m_output_filebase + ".vsf", conf},
-            m_vcf_file {params.m_output_filebase + ".vcf"},
-            m_patch_file {params.m_output_filebase + ".patch"} {
+            m_vtf_file {params.m_output_filebase + ".vtf", conf},
+            m_patch_file {params.m_output_filebase + ".patch"},
+            m_pipe_vtf_file {params.m_output_filebase + "_pipe.vtf", conf},
+            m_pipe_patch_file {params.m_output_filebase + "_pipe.patch"} {
 
+        m_pipe_vtf_file.close();
+        m_pipe_patch_file.close();
         construct_movetypes(params);
     }
 
@@ -42,8 +45,10 @@ namespace simulation {
 
             // Output configuration and order parameters
             if (m_config_output_freq and step % m_config_output_freq == 0) {
-                m_vcf_file.write_step(m_config, step);
+                m_vtf_file.write_step(m_config, step);
                 m_patch_file.write_step(m_config);
+                m_pipe_vtf_file.open_write_close(m_config, step);
+                m_pipe_patch_file.open_write_step_close(m_config);
             }
             //if (m_op_output_freq and step % m_op_output_freq) {
                 // Write op to file
