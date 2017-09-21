@@ -64,7 +64,7 @@ SCENARIO("Individual particles are moved in a box with PBC") {
             vecT crot {1, 1, 1};
             rotMatT rmat;
 
-            // This is positive pi rotation in the z axis
+            // This is positive pi/2 rotation in the z axis
             rmat << 0, -1, 0,
                     1,  0, 0,
                     0,  0, 1;
@@ -86,8 +86,32 @@ SCENARIO("Individual particles are moved in a box with PBC") {
                 REQUIRE(c_patch_orient == s_patch_orient);
             }
         }
-        // I need to think about how rotations might happen near the boundaries of the box
-//        WHEN("Rotated about a point outside") {
-//        }
+        WHEN("Rotated about a point outside") {
+            s_pos = {-4, 0, 0};
+            vecT crot {4, 0, 0};
+            rotMatT rmat;
+
+            // This is positive pi rotation in the z axis
+            rmat << 0, -1, 0,
+                    1,  0, 0,
+                    0,  0, 1;
+            part.set_pos(s_pos);
+            part.rotate(crot, rmat);
+            THEN("Trial position and orientation updated") {
+                vecT e_pos {4, 2, 0};
+                REQUIRE(part.get_pos(CoorSet::trial) == e_pos);
+                REQUIRE(part.get_pos(CoorSet::current) == s_pos);
+                vecT r_patch_norm {part.get_ore(CoorSet::trial).patch_norm};
+                vecT c_patch_norm {part.get_ore(CoorSet::current).patch_norm};
+                vecT r_patch_orient {part.get_ore(CoorSet::trial).patch_orient};
+                vecT c_patch_orient {part.get_ore(CoorSet::current).patch_orient};
+                vecT e_patch_norm {0, 1, 0};
+                REQUIRE(r_patch_norm == e_patch_norm);
+                REQUIRE(c_patch_norm == s_patch_norm);
+                vecT e_patch_orient {-1, 0, 0};
+                REQUIRE(r_patch_orient == e_patch_orient);
+                REQUIRE(c_patch_orient == s_patch_orient);
+            }
+        }
     }
 }

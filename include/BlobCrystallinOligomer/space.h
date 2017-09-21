@@ -16,9 +16,17 @@ namespace space {
             CuboidPBC(distT len);
 
             void set_len(distT len);
-            distT calc_dist(vecT pos1, vecT pos2);
-            vecT calc_diff(vecT pos1, vecT pos2);
+            distT calc_dist(vecT& pos1, vecT& pos2);
+            vecT calc_diff(vecT& pos1, vecT& pos2);
             vecT wrap(vecT pos);
+            
+            /** Unwrapped given second vector relative to first
+              *
+              * Return the second vector that is closest to the first, where
+              * the second vector has possibly been wapped back inthe the unit
+              * cell.
+              */
+            vecT unwrap(vecT pos1, vecT pos2);
 
         private:
             distT m_r;

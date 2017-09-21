@@ -37,20 +37,23 @@ namespace particle {
 
             int get_index();
             int get_type();
-            vecT get_pos(CoorSet coorset);
+            vecT& get_pos(CoorSet coorset);
             Orientation& get_ore(CoorSet coorset);
 
             /** Set the current position */
-            void set_pos(vecT pos);
+            void set_pos(vecT& pos);
 
             /** Translate particle by given vector and store as trial*/
-            void translate(vecT disv);
+            void translate(vecT& disv);
 
             /** Rotate particle around given origin and store as trial */
-            virtual void rotate(vecT rot_c, rotMatT rot_mat);
+            virtual void rotate(vecT& rot_c, rotMatT& rot_mat);
 
             /** Make trial configuration current configuration */
             void trial_to_current();
+
+            /** Reset trial with current */
+            void current_to_trial();
 
         protected:
             Orientation m_ore;
@@ -69,7 +72,7 @@ namespace particle {
         public:
             PatchyParticle(int index, int type, vecT pos, Orientation ore,
                     CuboidPBC& pbc_space);
-            virtual void rotate(vecT rot_c, rotMatT rot_mat);
+            virtual void rotate(vecT& rot_c, rotMatT& rot_mat);
     };
 
     /** Particle class with one directional patch and one orientational patch */
@@ -77,7 +80,7 @@ namespace particle {
         public:
             OrientedPatchyParticle(int index, int type, vecT pos,
                     Orientation ore, CuboidPBC& pbc_space);
-            void rotate(vecT rot_c, rotMatT rot_mat);
+            void rotate(vecT& rot_c, rotMatT& rot_mat);
     };
 }
 

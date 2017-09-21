@@ -16,21 +16,21 @@ namespace space {
         m_r = len/2;
     }
 
-    distT CuboidPBC::calc_dist(vecT pos1, vecT pos2) {
+    distT CuboidPBC::calc_dist(vecT& pos1, vecT& pos2) {
         vecT diff {calc_diff(pos1, pos2)};
 
         return diff.norm();
     }
 
-    vecT CuboidPBC::calc_diff(vecT pos1, vecT pos2) {
+    vecT CuboidPBC::calc_diff(vecT& pos1, vecT& pos2) {
         vecT diff;
         for (int i {0}; i != 3; i++) {
             distT comp_diff {pos1[i] - pos2[i]};
             if (comp_diff > m_r) {
-                comp_diff = -2*m_r + comp_diff;
+                comp_diff = 2*m_r - comp_diff;
             }
             else if (comp_diff < -m_r) {
-                comp_diff = 2*m_r + comp_diff;
+                comp_diff = -2*m_r - comp_diff;
             }
             diff[i] = comp_diff;
         }
@@ -49,5 +49,25 @@ namespace space {
         }
 
         return pos;
+    }
+
+    vecT CuboidPBC::unwrap(vecT pos1, vecT pos2) {
+        vecT unwrapped;
+        for (int i {0}; i != 3; i++) {
+            distT comp_diff {pos1[i] - pos2[i]};
+            if (comp_diff > m_r) {
+                comp_diff = 2*m_r - comp_diff;
+                unwrapped[i] = pos1[i] + comp_diff;
+            }
+            else if (comp_diff < -m_r) {
+                comp_diff = -2*m_r - comp_diff;
+                unwrapped[i] = pos1[i] + comp_diff;
+            }
+            else {
+                unwrapped[i] = pos2[i];
+            }
+        }
+
+        return unwrapped;
     }
 }

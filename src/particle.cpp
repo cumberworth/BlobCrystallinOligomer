@@ -1,8 +1,12 @@
 // particle.cpp
 
+#include <iostream>
+
 #include "BlobCrystallinOligomer/particle.h"
 
 namespace particle {
+
+    using std::cout;
 
     Particle::Particle(int index, int type, vecT pos, Orientation ore,
             CuboidPBC& pbc_space):
@@ -23,7 +27,7 @@ namespace particle {
         return m_type;
     }
 
-    vecT Particle::get_pos(CoorSet coorset) {
+    vecT& Particle::get_pos(CoorSet coorset) {
         if (coorset == CoorSet::current) {
             return m_pos;
         }
@@ -41,19 +45,21 @@ namespace particle {
         }
     }
 
-    void Particle::set_pos(vecT pos) {
+    void Particle::set_pos(vecT& pos) {
         m_pos = pos;
     }
 
-    void Particle::translate(vecT disv) {
+    void Particle::translate(vecT& disv) {
         m_trial_pos = m_pos + disv;
         m_trial_pos = m_space.wrap(m_trial_pos);
     }
 
-    void Particle::rotate(vecT rot_c, rotMatT rot_mat) {
-        m_trial_pos = m_pos - rot_c;
+    void Particle::rotate(vecT& rot_c, rotMatT& rot_mat) {
+        vecT unwrapped_pos {m_space.unwrap(rot_c, m_pos)};
+        m_trial_pos = unwrapped_pos - rot_c;
         m_trial_pos = rot_mat * m_trial_pos;
         m_trial_pos = m_trial_pos + rot_c;
+        m_trial_pos = m_space.wrap(m_trial_pos);
     }
 
     void Particle::trial_to_current() {
@@ -61,12 +67,17 @@ namespace particle {
         m_ore = m_trial_ore;
     }
 
+    void Particle::current_to_trial() {
+        m_trial_pos = m_pos;
+        m_trial_ore = m_ore;
+    }
+
     PatchyParticle::PatchyParticle(int index, int type, vecT pos,
             Orientation ore, CuboidPBC& pbc_space):
             Particle {index, type, pos, ore, pbc_space} {
     }
 
-    void PatchyParticle::rotate(vecT rot_c, rotMatT rot_mat) {
+    void PatchyParticle::rotate(vecT& rot_c, rotMatT& rot_mat) {
         Particle::rotate(rot_c, rot_mat);
         m_trial_ore.patch_norm = rot_mat * m_ore.patch_norm;
     }
@@ -76,7 +87,7 @@ namespace particle {
             PatchyParticle {index, type, pos, ore, pbc_space} {
     }
 
-    void OrientedPatchyParticle::rotate(vecT rot_c, rotMatT rot_mat) {
+    void OrientedPatchyParticle::rotate(vecT& rot_c, rotMatT& rot_mat) {
         PatchyParticle::rotate(rot_c, rot_mat);
         m_trial_ore.patch_orient = rot_mat * m_ore.patch_orient;
     }
