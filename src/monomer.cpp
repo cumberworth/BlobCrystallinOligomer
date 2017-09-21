@@ -15,7 +15,8 @@ namespace monomer {
     using std::cout;
 
     Monomer::Monomer(MonomerData m_data, CuboidPBC& pbc_space):
-            m_index {m_data.index} {
+            m_index {m_data.index},
+            m_space {pbc_space} {
 
         create_particles(m_data.particles, pbc_space);
 
@@ -41,8 +42,11 @@ namespace monomer {
 
     vecT Monomer::get_center() {
         vecT center {0, 0, 0};
-        for (Particle& particle: m_particle_refs) {
-            center += particle.get_pos(CoorSet::current);
+        vecT& prev_pos {m_particle_refs[0].get().get_pos(CoorSet::current)};
+        center += prev_pos;
+        for (size_t i {1}; i != m_particle_refs.size(); i++) {
+            vecT& pos {m_particle_refs[i].get().get_pos(CoorSet::current)};
+            center += m_space.unwrap(prev_pos, pos);
         }
         center /= m_particles.size();
 
@@ -60,6 +64,13 @@ namespace monomer {
         for (size_t i {0}; i != m_particles.size(); i++) {
             Particle& particle {m_particle_refs[i].get()};
             particle.rotate(rot_c, rot_mat);
+        }
+    }
+
+    void Monomer::current_to_trial() {
+        for (size_t i {0}; i != m_particles.size(); i++) {
+            Particle& particle {m_particle_refs[i].get()};
+            particle.current_to_trial();
         }
     }
 

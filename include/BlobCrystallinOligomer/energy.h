@@ -68,6 +68,9 @@ namespace energy {
             monomerArrayT get_interacting_monomers(Monomer& monomer1,
                     CoorSet coorset1);
 
+            /** Calculate energy difference between current and trial */
+            eneT calc_monomer_diff(Monomer& monomer);
+
             /** Check if particles within range to have non-zero pair potential */
             bool particles_interacting(
                     Particle& particle1,
@@ -85,7 +88,6 @@ namespace energy {
         private:
             Config& m_config;
             vector<unique_ptr<PairPotential>> m_potentials;
-            //unordered_map<pair<int, int>, reference_wrapper<PairPotential>> m_pair_to_pot;
             unordered_map<pair<int, int>, reference_wrapper<PairPotential>> m_pair_to_pot;
 
             void create_potentials(vector<PotentialData> potentials,

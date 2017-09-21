@@ -54,10 +54,8 @@ namespace energy {
         eneT pair_ene {0};
         particleArrayT particles1 {monomer1.get_particles()};
         particleArrayT particles2 {monomer2.get_particles()};
-        for (size_t p1_i {0}; p1_i != particles1.size(); p1_i++) {
-            for (size_t p2_i {p1_i}; p2_i != particles2.size(); p2_i++) {
-                Particle& p1 = particles1[p1_i]; // Doesn't allow {} intialization
-                Particle& p2 = particles2[p2_i];
+        for (Particle& p1: particles1) {
+            for (Particle& p2: particles2) {
                 eneT part_ene {calc_particle_pair_energy(p1, coorset1, p2, coorset2)};
                 if (part_ene == inf) {
                     return inf;
@@ -75,32 +73,18 @@ namespace energy {
         bool m_interacting {false};
         particleArrayT particles1 {monomer1.get_particles()};
         particleArrayT particles2 {monomer2.get_particles()};
-        for (size_t p1_i {0}; p1_i != particles1.size(); p1_i++) {
-            for (size_t p2_i {p1_i}; p2_i != particles2.size(); p2_i++) {
-                Particle& p1 = particles1[p1_i]; // Doesn't allow {} intialization
-                Particle& p2 = particles2[p2_i];
+        for (Particle& p1: particles1) {
+            for (Particle& p2: particles2) {
                 bool p_interacting {particles_interacting(p1, coorset1, p2,
                         coorset2)};
                 if (p_interacting) {
                     m_interacting = true;
-                    break;
+                    return m_interacting;
                 }
             }
         }
 
         return m_interacting;
-    }
-
-    bool Energy::particles_interacting(Particle& particle1, CoorSet coorset1,
-            Particle& particle2, CoorSet coorset2) {
-
-        distT dist {m_config.calc_dist(particle1, coorset1, particle2, coorset2)};
-        pair<int, int> key {particle1.get_type(), particle2.get_type()};
-
-        PairPotential& pot {m_pair_to_pot.at(key).get()};
-        bool interacting {pot.particles_interacting(dist)};
-
-        return interacting;
     }
 
     monomerArrayT Energy::get_interacting_monomers(Monomer& monomer1,
@@ -122,11 +106,41 @@ namespace energy {
         return interacting_monomers;
     }
 
+    eneT Energy::calc_monomer_diff(Monomer& mono1) {
+        monomerArrayT monos {m_config.get_monomers()};
+        eneT de {0};
+        for (size_t i {0}; i != monos.size(); i++) {
+            Monomer& mono2 {monos[i].get()};
+            if (mono1.get_index() == mono2.get_index()) {
+                continue;
+            }
+            eneT ene1 {calc_monomer_pair_energy(mono1, CoorSet::current, mono2,
+                    CoorSet::current)};
+            eneT ene2 {calc_monomer_pair_energy(mono1, CoorSet::trial, mono2,
+                    CoorSet::current)};
+            de += ene2 - ene1;
+            }
+
+        return de;
+    }
+
+    bool Energy::particles_interacting(Particle& particle1, CoorSet coorset1,
+            Particle& particle2, CoorSet coorset2) {
+
+        distT dist {m_config.calc_dist(particle1, coorset1, particle2, coorset2)};
+        pair<int, int> key {particle1.get_type(), particle2.get_type()};
+
+        PairPotential& pot {m_pair_to_pot.at(key).get()};
+        bool interacting {pot.particles_interacting(dist)};
+
+        return interacting;
+    }
+
     eneT Energy::calc_particle_pair_energy(Particle& particle1, CoorSet coorset1,
             Particle& particle2, CoorSet coorset2) {
 
-        vecT diff {m_config.calc_interparticle_vector(particle1, coorset1,
-                particle2, coorset2)};
+        vecT diff {m_config.calc_interparticle_vector(particle2, coorset2,
+                particle1, coorset1)};
         distT dist {diff.norm()};
         auto p1_ore {particle1.get_ore(coorset1)};
         auto p2_ore {particle2.get_ore(coorset1)};

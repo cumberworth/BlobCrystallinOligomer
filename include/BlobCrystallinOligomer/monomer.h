@@ -57,8 +57,13 @@ namespace monomer {
             /** Make trial configuration current configuration */
             void trial_to_current();
 
+            /** Reset trial to current */
+            void current_to_trial();
+
         private:
             int m_index; // Unique monomer index
+            CuboidPBC& m_space;
+
             vector<unique_ptr<Particle>> m_particles;
             particleArrayT m_particle_refs;
             int m_num_particles;

@@ -73,9 +73,9 @@ namespace config {
             /** Calculate distance between two particles */
             distT calc_dist(
                     Particle& particle1,
-                    CoorSet coorset1,
+                    CoorSet& coorset1,
                     Particle& particle2,
-                    CoorSet coorset2);
+                    CoorSet& coorset2);
 
         private:
             vector<unique_ptr<Monomer>> m_monomers;

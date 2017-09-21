@@ -77,17 +77,17 @@ namespace config {
     vecT Config::calc_interparticle_vector(Particle& particle1, CoorSet coorset1,
             Particle& particle2, CoorSet coorset2) {
 
-        vecT pos1 {particle1.get_pos(coorset1)};
-        vecT pos2 {particle2.get_pos(coorset2)};
+        vecT& pos1 {particle1.get_pos(coorset1)};
+        vecT& pos2 {particle2.get_pos(coorset2)};
 
         return m_space.calc_diff(pos1, pos2);
     }
 
-    distT Config::calc_dist(Particle& particle1, CoorSet coorset1,
-            Particle& particle2, CoorSet coorset2) {
+    distT Config::calc_dist(Particle& particle1, CoorSet& coorset1,
+            Particle& particle2, CoorSet& coorset2) {
 
-        vecT pos1 {particle1.get_pos(coorset1)};
-        vecT pos2 {particle2.get_pos(coorset2)};
+        vecT& pos1 {particle1.get_pos(coorset1)};
+        vecT& pos2 {particle2.get_pos(coorset2)};
 
         return m_space.calc_dist(pos1, pos2);
     }
