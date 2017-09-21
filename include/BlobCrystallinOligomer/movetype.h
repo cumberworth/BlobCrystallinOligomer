@@ -4,6 +4,7 @@
 #define MOVETYPE_H
 
 #include <cmath>
+#include <memory>
 #include <set>
 #include <string>
 #include <utility>
@@ -14,6 +15,7 @@
 #include "BlobCrystallinOligomer/hash.h"
 #include "BlobCrystallinOligomer/monomer.h"
 #include "BlobCrystallinOligomer/param.h"
+#include "BlobCrystallinOligomer/shared_types.h"
 #include "BlobCrystallinOligomer/random_gens.h"
 
 namespace movetype {
@@ -30,6 +32,7 @@ namespace movetype {
     using shared_types::vecT;
     using std::pair;
     using std::set;
+    using std::unique_ptr;
     using std::sqrt;
     using std::string;
     using std::vector;
@@ -43,21 +46,72 @@ namespace movetype {
       */
     distT random_displacement(distT max_disp, RandomGens& random_num);
 
+    class Movemap {
+        public:
+            Movemap(RandomGens& random_num);
+            virtual ~Movemap() {}
+
+            virtual void generate_movemap(Monomer& monomer) = 0;
+            virtual void apply_movemap(Monomer& monomer) = 0;
+
+        protected:
+            RandomGens& m_random_num;
+    };
+
+    class TranslationMovemap:
+            public Movemap {
+
+        public:
+            TranslationMovemap(distT max_disp_tc, RandomGens& random_num);
+
+            void generate_movemap(Monomer&);
+            void apply_movemap(Monomer& monomer);
+
+        private:
+            distT m_max_disp_tc;
+
+            vecT m_disp_v;
+    };
+
+    class RotationMovemap:
+            public Movemap {
+
+        public:
+            RotationMovemap(
+                    distT max_disp_rc,
+                    distT max_disp_a,
+                    RandomGens& random_num);
+
+            void generate_movemap(Monomer& monomer);
+            void apply_movemap(Monomer& monomer);
+
+        private:
+            distT m_max_disp_rc;
+            distT m_max_disp_a;
+
+            vecT m_rot_c; // Centre of rotation
+            rotMatT m_rot_mat; // Rotation matrix
+    };
+
     /** General movetype interface */
     class MCMovetype {
         public:
             MCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
-                    InputParams params);
+                    InputParams params, string label);
+            virtual ~MCMovetype() {}
 
             /** Attempt move and return result (accepted or rejectd) */
             virtual bool move() = 0;
-            virtual string label() {return "MCMovetype";}
+
+            string get_label();
 
         protected:
             Config& m_config;
             Energy& m_energy;
             RandomGens& m_random_num;
             eneT m_beta;
+            string m_label;
+            unique_ptr<Movemap> m_movemap;
     };
 
     /** Flip the NTD conformation
@@ -66,30 +120,49 @@ namespace movetype {
       * attempts to flip the conformation via reflection in a plane of a
       * randomly selected monomer.
       */
-    class NTDFlipMCMovetype: public MCMovetype {
+    class NTDFlipMCMovetype:
+            public MCMovetype {
+
         public:
             using MCMovetype::MCMovetype;
             bool move() {}
-            string label() {return "NTDFlipMCMovetype";}
-    };
-
-    /** Shared implementation for virtual moves */
-    class VMMCMovetype: public MCMovetype {
-        public:
-            using MCMovetype::MCMovetype;
-            bool move();
-            string label() {return "VMMCMovetype";}
 
         private:
+    };
+
+    /** Metropolis move */
+    class MetMCMovetype:
+            public MCMovetype {
+
+        public:
+            MetMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
+                    InputParams params, string label, string movemap_type);
+
+            bool move();
+
+        protected:
+            bool accept_move(eneT de);
+    };
+
+    /** Virtual move */
+    class VMMCMovetype:
+            public MCMovetype {
+
+        public:
+            VMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
+                    InputParams params, string label, string movemap_type);
+
+            bool move();
+
+        private:
+
             monomerArrayT m_cluster;
             int m_frustrated_links {0};
             vector<int> m_frustrated_mis {};
             set<pair<int, int>> m_proposed_pairs {};
             set<int> m_interacting_mis;
             set<pair<int, int>> m_pair_mis;
-
-            void virtual generate_movemap(Monomer& seed_monomer) = 0;
-            void virtual apply_movemap(Monomer& monomer) = 0;
+            unique_ptr<Movemap> m_movemap;
 
             void add_interacting_pairs(Monomer& monomer1);
             pair<int, int> pop_random_pair();
@@ -98,37 +171,6 @@ namespace movetype {
             bool accept_link(double prelink_for_p, double prelink_rev_p);
             bool accept_move();
             void reset_internal();
-    };
-
-    /** Translational virtual movetype */
-    class TranslationVMMCMovetype: public VMMCMovetype {
-        public:
-            TranslationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
-                    InputParams params);
-            string label() {return "TranslationVMMCMovetype";}
-        private:
-            void generate_movemap(Monomer&);
-            void apply_movemap(Monomer& monomer);
-
-            distT m_max_disp_tc;
-            vecT m_disp_v;
-    };
-
-    /** Rotational virtual movetype */
-    class RotationVMMCMovetype: public VMMCMovetype {
-        public:
-            RotationVMMCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
-                    InputParams params);
-            string label() {return "RotationVMMCMovetype";}
-        private:
-            void generate_movemap(Monomer& seed_monomer);
-            void apply_movemap(Monomer& monomer);
-
-            distT m_max_disp_rc;
-            distT m_max_disp_a;
-            vecT m_rot_c; // Centre of rotation
-            rotMatT m_rot_mat; // Rotation matrix
-            
     };
 }
 

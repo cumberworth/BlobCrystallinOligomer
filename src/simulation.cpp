@@ -6,8 +6,8 @@
 
 namespace simulation {
 
-    using movetype::RotationVMMCMovetype;
-    using movetype::TranslationVMMCMovetype;
+    using movetype::MetMCMovetype;
+    using movetype::VMMCMovetype;
     using movetype::NTDFlipMCMovetype;
     using std::cout;
     using std::setw;
@@ -40,7 +40,7 @@ namespace simulation {
 
             // Log
             if (m_logging_freq and step % m_logging_freq == 0) {
-                log_move(step, movetype.label(), accepted);
+                log_move(step, movetype.get_label(), accepted);
             }
 
             // Output configuration and order parameters
@@ -61,26 +61,51 @@ namespace simulation {
         // This is pretty ugly
         // Also creates the cumalitive probability array
         double cum_prob {0};
-        if (params.m_rotation_vmmc) {
+        if (params.m_translation_met) {
             MCMovetype* movetype;
-            movetype = new RotationVMMCMovetype {m_config, m_energy,
-                    m_random_num, params};
+            string label {"TranslationMetMCMovetype"};
+            string movemap_type {"translation"};
+            movetype = new MetMCMovetype {m_config, m_energy,
+                    m_random_num, params, label, movemap_type};
             m_movetypes.emplace_back(movetype);
-            cum_prob += params.m_rotation_vmmc;
+            cum_prob += params.m_translation_met;
+            m_cum_probs.push_back(cum_prob);
+        }
+        if (params.m_rotation_met) {
+            MCMovetype* movetype;
+            string label {"RotationMetMCMovetype"};
+            string movemap_type {"rotation"};
+            movetype = new MetMCMovetype {m_config, m_energy,
+                    m_random_num, params, label, movemap_type};
+            m_movetypes.emplace_back(movetype);
+            cum_prob += params.m_rotation_met;
             m_cum_probs.push_back(cum_prob);
         }
         if (params.m_translation_vmmc) {
             MCMovetype* movetype;
-            movetype = new TranslationVMMCMovetype {m_config, m_energy,
-                    m_random_num, params};
+            string label {"TranslationVMMCMovetype"};
+            string movemap_type {"translation"};
+            movetype = new VMMCMovetype {m_config, m_energy,
+                    m_random_num, params, label, movemap_type};
             m_movetypes.emplace_back(movetype);
             cum_prob += params.m_translation_vmmc;
             m_cum_probs.push_back(cum_prob);
         }
+        if (params.m_rotation_vmmc) {
+            MCMovetype* movetype;
+            string label {"RotationVMMCMovetype"};
+            string movemap_type {"rotation"};
+            movetype = new VMMCMovetype {m_config, m_energy,
+                    m_random_num, params, label, movemap_type};
+            m_movetypes.emplace_back(movetype);
+            cum_prob += params.m_rotation_vmmc;
+            m_cum_probs.push_back(cum_prob);
+        }
         if (params.m_ntd_flip) {
             MCMovetype* movetype;
+            string label {"NTDFlipMCMovetype"};
             movetype = new NTDFlipMCMovetype {m_config, m_energy,
-                    m_random_num, params};
+                    m_random_num, params, label};
             m_movetypes.emplace_back(movetype);
             cum_prob += params.m_ntd_flip;
             m_cum_probs.push_back(cum_prob);
@@ -120,7 +145,7 @@ namespace simulation {
         cout << "Accepts" << setw(10);
         cout << "Frequency" << "\n";
         for (size_t i {0}; i != m_movetypes.size(); i++) {
-            cout << m_movetypes[i]->label() << setw(10);
+            cout << m_movetypes[i]->get_label() << setw(10);
             cout << m_move_attempts[i] << setw(10);
             cout << m_move_accepts[i] << setw(10);
             cout << static_cast<double>(m_move_accepts[i]) /

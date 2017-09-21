@@ -46,8 +46,10 @@ namespace param {
             distT m_max_disp_tc;
             distT m_max_disp_rc;
             distT m_max_disp_a;
-            double m_rotation_vmmc;
+            double m_translation_met;
+            double m_rotation_met;
             double m_translation_vmmc;
+            double m_rotation_vmmc;
             double m_ntd_flip;
             
             // Output
@@ -57,6 +59,8 @@ namespace param {
             stepT m_op_output_freq;
 
         private:
+            string m_rotation_met_raw;
+            string m_translation_met_raw;
             string m_rotation_vmmc_raw;
             string m_translation_vmmc_raw;
             string m_ntd_flip_raw;

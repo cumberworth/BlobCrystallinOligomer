@@ -85,12 +85,18 @@ namespace param {
             ("max_disp_a",
                 po::value<distT>(&m_max_disp_a)->default_value(1),
                 "Maximum displacement for selecting rotation angle")
-            ("rotation_vmmc",
-                po::value<string>(&m_rotation_vmmc_raw)->default_value("0"),
-                "Probability of performing a rotation VMMC")
+            ("translation_met",
+                po::value<string>(&m_translation_met_raw)->default_value("0"),
+                "Probability of performing a translation Metropolis movetype")
+            ("rotation_met",
+                po::value<string>(&m_rotation_met_raw)->default_value("0"),
+                "Probability of performing a rotation Metropolis movetype")
             ("translation_vmmc",
                 po::value<string>(&m_translation_vmmc_raw)->default_value("0"),
                 "Probability of performing a translation VMMC")
+            ("rotation_vmmc",
+                po::value<string>(&m_rotation_vmmc_raw)->default_value("0"),
+                "Probability of performing a rotation VMMC")
             ("ntd_flip",
                 po::value<string>(&m_ntd_flip_raw)->default_value("0"),
                 "Probability of performing a NTD flip")
@@ -141,6 +147,10 @@ namespace param {
     void InputParams::post_process_inputs() {
 
         // Parse fractions for movetype probabilities
+        Fraction rotation_met_fraction {m_rotation_met_raw};
+        m_rotation_met = rotation_met_fraction.to_double();
+        Fraction translation_met_fraction {m_translation_met_raw};
+        m_translation_met = translation_met_fraction.to_double();
         Fraction rotation_vmmc_fraction {m_rotation_vmmc_raw};
         m_rotation_vmmc = rotation_vmmc_fraction.to_double();
         Fraction translation_vmmc_fraction {m_translation_vmmc_raw};
