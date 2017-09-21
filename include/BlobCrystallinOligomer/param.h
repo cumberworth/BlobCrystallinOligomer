@@ -41,6 +41,7 @@ namespace param {
 
             // Simulation options
             stepT m_steps;
+            distT m_max_cutoff; // Not very nice to put here
 
             // Movetypes
             distT m_max_disp_tc;

@@ -92,6 +92,15 @@ namespace config {
         return m_space.calc_dist(pos1, pos2);
     }
 
+    distT Config::calc_dist(Monomer& monomer1, CoorSet& coorset1,
+            Monomer& monomer2, CoorSet& coorset2) {
+
+        vecT pos1 {monomer1.get_center(coorset1)};
+        vecT pos2 {monomer2.get_center(coorset2)};
+
+        return m_space.calc_dist(pos1, pos2);
+    }
+
     void Config::create_monomers(vector<MonomerData> monomers) {
         for (auto m_data: monomers) {
             m_monomers.emplace_back(make_unique<Monomer>(m_data, m_space));

@@ -13,14 +13,14 @@ namespace energy {
     using potential::ShiftedLJPotential;
     using potential::PatchyPotential;
     using potential::OrientedPatchyPotential;
-    using shared_types::distT;
     using shared_types::inf;
     using shared_types::InputError;
     using shared_types::vecT;
     using std::cout;
 
     Energy::Energy(Config& conf, InputParams params):
-            m_config {conf} {
+            m_config {conf},
+            m_max_cutoff {params.m_max_cutoff} {
 
         InputEnergyFile energy_file {params.m_energy_filename};
         vector<PotentialData> potentials {energy_file.get_potentials()};
@@ -71,6 +71,9 @@ namespace energy {
             Monomer& monomer2, CoorSet coorset2) {
 
         bool m_interacting {false};
+        if (not monomers_in_range(monomer1, coorset1, monomer2, coorset2)) {
+            return m_interacting;
+        }
         particleArrayT particles1 {monomer1.get_particles()};
         particleArrayT particles2 {monomer2.get_particles()};
         for (Particle& p1: particles1) {
@@ -85,6 +88,21 @@ namespace energy {
         }
 
         return m_interacting;
+    }
+
+    bool Energy::monomers_in_range(Monomer& monomer1, CoorSet coorset1,
+            Monomer& monomer2, CoorSet coorset2) {
+
+        bool in_range {false};
+        distT monomer1_r {monomer1.get_radius()};
+        distT monomer2_r {monomer2.get_radius()};
+        distT max_interaction_d {monomer1_r + monomer2_r + m_max_cutoff};
+        distT d {m_config.calc_dist(monomer1, coorset1, monomer2, coorset2)};
+        if (d <= max_interaction_d) {
+            in_range = true;
+        }
+
+        return in_range;
     }
 
     monomerArrayT Energy::get_interacting_monomers(Monomer& monomer1,

@@ -28,6 +28,7 @@ namespace energy {
     using particle::Particle;
     using potential::PairPotential;
     using shared_types::CoorSet;
+    using shared_types::distT;
     using shared_types::eneT;
     using std::pair;
     using std::reference_wrapper;
@@ -89,9 +90,15 @@ namespace energy {
             Config& m_config;
             vector<unique_ptr<PairPotential>> m_potentials;
             unordered_map<pair<int, int>, reference_wrapper<PairPotential>> m_pair_to_pot;
+            distT m_max_cutoff;
 
             void create_potentials(vector<PotentialData> potentials,
                     vector<InteractionData> interactions);
+            bool monomers_in_range(
+                    Monomer& monomer1,
+                    CoorSet coorset1,
+                    Monomer& monomer2,
+                    CoorSet coorset2);
     };
 }
 

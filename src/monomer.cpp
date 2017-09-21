@@ -12,6 +12,7 @@ namespace monomer {
     using particle::OrientedPatchyParticle;
     using particle::PatchyParticle;
     using shared_types::CoorSet;
+    using shared_types::distT;
     using std::cout;
 
     Monomer::Monomer(MonomerData m_data, CuboidPBC& pbc_space):
@@ -26,6 +27,7 @@ namespace monomer {
         }
 
         m_num_particles = m_particles.size();
+        calc_monomer_radius();
     }
 
     int Monomer::get_index() {
@@ -40,17 +42,21 @@ namespace monomer {
         return m_num_particles;
     }
 
-    vecT Monomer::get_center() {
+    vecT Monomer::get_center(CoorSet coorset) {
         vecT center {0, 0, 0};
-        vecT& prev_pos {m_particle_refs[0].get().get_pos(CoorSet::current)};
+        vecT& prev_pos {m_particle_refs[0].get().get_pos(coorset)};
         center += prev_pos;
         for (size_t i {1}; i != m_particle_refs.size(); i++) {
-            vecT& pos {m_particle_refs[i].get().get_pos(CoorSet::current)};
+            vecT& pos {m_particle_refs[i].get().get_pos(coorset)};
             center += m_space.unwrap(prev_pos, pos);
         }
         center /= m_particles.size();
 
-        return center;
+        return m_space.wrap(center);
+    }
+
+    distT Monomer::get_radius() {
+        return m_r;
     }
 
     void Monomer::translate(vecT disv) {
@@ -109,5 +115,18 @@ namespace monomer {
             }
             m_particles.emplace_back(part);
         }
+    }
+
+    void Monomer::calc_monomer_radius() {
+        vecT c {get_center(CoorSet::current)};
+        distT max_d {};
+        for (Particle& p: m_particle_refs) {
+            distT d {m_space.calc_dist(p.get_pos(CoorSet::current), c)};
+            if (d > max_d) {
+                max_d = d;
+            }
+        }
+
+        m_r = max_d;
     }
 }

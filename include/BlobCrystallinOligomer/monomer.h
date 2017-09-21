@@ -16,6 +16,8 @@ namespace monomer {
     using ifile::MonomerData;
     using ifile::ParticleData;
     using particle::Particle;
+    using shared_types::CoorSet;
+    using shared_types::distT;
     using shared_types::rotMatT;
     using shared_types::vecT;
     using space::CuboidPBC;
@@ -46,7 +48,10 @@ namespace monomer {
             int get_num_particles();
 
             /** Get geometric center of all particles */
-            vecT get_center();
+            vecT get_center(CoorSet coorset);
+
+            /** Get maximum length from monomer center to particle center */
+            distT get_radius();
 
             /** Translate monomer by given vector */
             void translate(vecT disv);
@@ -67,9 +72,11 @@ namespace monomer {
             vector<unique_ptr<Particle>> m_particles;
             particleArrayT m_particle_refs;
             int m_num_particles;
+            distT m_r;
 
             void create_particles(vector<ParticleData> p_datas,
                     CuboidPBC& pbc_space);
+            void calc_monomer_radius();
     };
 }
 

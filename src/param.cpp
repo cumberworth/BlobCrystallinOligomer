@@ -71,6 +71,9 @@ namespace param {
             ("steps",
                 po::value<stepT>(&m_steps)->default_value(0),
                 "Number of steps")
+            ("max_cutoff",
+                po::value<distT>(&m_max_cutoff)->default_value(0),
+                "Maximum cutoff value of any included potential")
         ;
         displayed_options.add(sim_options);
 

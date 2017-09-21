@@ -77,6 +77,13 @@ namespace config {
                     Particle& particle2,
                     CoorSet& coorset2);
 
+            /** Calculate distance between two monomers (centers) */
+            distT calc_dist(
+                    Monomer& monomer1,
+                    CoorSet& coorset1,
+                    Monomer& monomer2,
+                    CoorSet& coorset2);
+
         private:
             vector<unique_ptr<Monomer>> m_monomers;
             monomerArrayT m_monomer_refs;

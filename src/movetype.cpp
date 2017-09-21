@@ -72,7 +72,7 @@ namespace movetype {
     void RotationMovemap::generate_movemap(Monomer& monomer) {
         vecT rand_v {random_unit_vector(m_random_num)};
         distT scalar {random_displacement(m_max_disp_rc, m_random_num)};
-        m_rot_c = monomer.get_center() + scalar*rand_v;
+        m_rot_c = monomer.get_center(CoorSet::current) + scalar*rand_v;
         vecT axis {random_unit_vector(m_random_num)};
         distT theta {random_displacement(m_max_disp_a, m_random_num)};
         AngleAxis<distT> angle_axis {theta, axis};
