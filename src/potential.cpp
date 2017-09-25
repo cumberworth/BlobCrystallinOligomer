@@ -30,6 +30,14 @@ namespace potential {
         return interacting;
     }
 
+    ZeroPotential::ZeroPotential():
+            PairPotential {0} {
+    }
+
+    eneT ZeroPotential::calc_energy(distT, vecT&, Orientation&, Orientation&) {
+        return 0;
+    }
+
     HardSpherePotential::HardSpherePotential(double sigh):
             PairPotential {sigh}, m_sigh {sigh} {
     }
@@ -38,6 +46,19 @@ namespace potential {
         eneT ene {0};
         if (rdist < m_sigh) {
             ene = inf;
+        }
+
+        return ene;
+    }
+
+    SquareWellPotential::SquareWellPotential(eneT eps, distT rcut):
+            PairPotential {rcut}, m_eps {eps}, m_rcut {rcut} {
+    }
+
+    eneT SquareWellPotential::calc_energy(distT rdist, vecT&, Orientation&, Orientation&) {
+        eneT ene {0};
+        if (rdist < m_rcut) {
+            ene = m_eps;
         }
 
         return ene;

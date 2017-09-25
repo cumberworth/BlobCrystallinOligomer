@@ -9,7 +9,9 @@ namespace energy {
 
     using ifile::InputEnergyFile;
     using monomer::particleArrayT;
+    using potential::ZeroPotential;
     using potential::HardSpherePotential;
+    using potential::SquareWellPotential;
     using potential::ShiftedLJPotential;
     using potential::PatchyPotential;
     using potential::OrientedPatchyPotential;
@@ -175,8 +177,14 @@ namespace energy {
 
         for (auto p_data: potentials) {
             PairPotential* pot;
+            if (p_data.form == "Zero") {
+                pot = new ZeroPotential {};
+            }
             if (p_data.form == "HardSphere") {
                 pot = new  HardSpherePotential {p_data.sigh};
+            }
+            if (p_data.form == "SquareWell") {
+                pot = new  SquareWellPotential {p_data.eps, p_data.rcut};
             }
             else if (p_data.form == "ShiftedLJ") {
                 pot = new ShiftedLJPotential {p_data.eps, p_data.sigl,

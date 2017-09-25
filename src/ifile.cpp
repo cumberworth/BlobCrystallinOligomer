@@ -93,6 +93,10 @@ namespace ifile {
             if (pot_form == "HardSphere") {
                 pot_data.sigh = json_potential["parameters"]["sigh"];
             }
+            if (pot_form == "SquareWell") {
+                pot_data.eps = json_potential["parameters"]["eps"];
+                pot_data.rcut = json_potential["parameters"]["rcut"];
+            }
             if (pot_form == "ShiftedLJ") {
                 pot_data.sigl = json_potential["parameters"]["sigl"];
                 pot_data.eps = json_potential["parameters"]["eps"];
