@@ -42,8 +42,8 @@ namespace energy {
             Monomer& monomer1 {monomers[i].get()};
             for (size_t j {i + 1}; j != monomers.size(); j++) {
                 Monomer& monomer2 {monomers[j].get()};
-                total_ene += {calc_monomer_pair_energy(monomer1, CoorSet::current,
-                        monomer2, CoorSet::current)};
+                total_ene += calc_monomer_pair_energy(monomer1, CoorSet::current,
+                        monomer2, CoorSet::current);
             }
         }
 
