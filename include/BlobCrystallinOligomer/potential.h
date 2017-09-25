@@ -35,6 +35,15 @@ namespace potential {
             distT m_rcut;
     };
 
+    /** No interaction */
+    class ZeroPotential:
+            public PairPotential {
+
+        public:
+            ZeroPotential();
+            eneT calc_energy(distT, vecT&, Orientation&, Orientation&);
+    };
+
     /** Hard sphere potential */
     class HardSpherePotential:
             public PairPotential {
@@ -45,6 +54,19 @@ namespace potential {
 
         private:
             distT m_sigh; // Sphere radius
+    };
+
+    /** Square well potential */
+    class SquareWellPotential:
+            public PairPotential {
+
+        public:
+            SquareWellPotential(eneT eps, distT rcut);
+            eneT calc_energy(distT rdist, vecT&, Orientation&, Orientation&);
+
+        private:
+            eneT m_eps;
+            distT m_rcut;
     };
 
     /** Shifted Lennard Jone potential */
