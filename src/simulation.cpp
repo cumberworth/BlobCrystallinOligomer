@@ -8,7 +8,6 @@ namespace simulation {
 
     using movetype::MetMCMovetype;
     using movetype::VMMCMovetype;
-    using movetype::NTDFlipMCMovetype;
     using std::cout;
     using std::setw;
 
@@ -104,8 +103,9 @@ namespace simulation {
         if (params.m_ntd_flip) {
             MCMovetype* movetype;
             string label {"NTDFlipMCMovetype"};
-            movetype = new NTDFlipMCMovetype {m_config, m_energy,
-                    m_random_num, params, label};
+            string movemap_type {"ntdflip"};
+            movetype = new MetMCMovetype {m_config, m_energy,
+                    m_random_num, params, label, movemap_type};
             m_movetypes.emplace_back(movetype);
             cum_prob += params.m_ntd_flip;
             m_cum_probs.push_back(cum_prob);

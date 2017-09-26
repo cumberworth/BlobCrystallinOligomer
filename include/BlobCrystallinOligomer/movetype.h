@@ -46,6 +46,7 @@ namespace movetype {
       */
     distT random_displacement(distT max_disp, RandomGens& random_num);
 
+    /** Movemap interface */
     class Movemap {
         public:
             Movemap(RandomGens& random_num);
@@ -58,6 +59,7 @@ namespace movetype {
             RandomGens& m_random_num;
     };
 
+    /** Translation movemap */
     class TranslationMovemap:
             public Movemap {
 
@@ -73,6 +75,11 @@ namespace movetype {
             vecT m_disp_v;
     };
 
+    /** Rotation movemap
+      *
+      * Selects a rotation center near the monomer center, a rotation axis, and
+      * an angle to rotate
+      */
     class RotationMovemap:
             public Movemap {
 
@@ -91,6 +98,27 @@ namespace movetype {
 
             vecT m_rot_c; // Centre of rotation
             rotMatT m_rot_mat; // Rotation matrix
+    };
+
+    /** NTD conformation flip
+      *
+      * There are two available conformations for the NTD which can be reached
+      * by reflecting the monomer in some plane
+      */
+    class NTDFlipMovemap:
+            public Movemap {
+
+        public:
+            NTDFlipMovemap(Config& config, RandomGens& random_num);
+
+            void generate_movemap(Monomer& monomer);
+            void apply_movemap(Monomer& monomer);
+
+        private:
+            Config& m_config;
+            rotMatT m_ref_mat; // Householder matrix
+            rotMatT m_imat; // Identity matrix
+            vecT m_point_in_plane;
     };
 
     /** General movetype interface */
@@ -112,22 +140,6 @@ namespace movetype {
             eneT m_beta;
             string m_label;
             unique_ptr<Movemap> m_movemap;
-    };
-
-    /** Flip the NTD conformation
-      *
-      * There are two available conformations for the NTD. This movetype will
-      * attempts to flip the conformation via reflection in a plane of a
-      * randomly selected monomer.
-      */
-    class NTDFlipMCMovetype:
-            public MCMovetype {
-
-        public:
-            using MCMovetype::MCMovetype;
-            bool move() {}
-
-        private:
     };
 
     /** Metropolis move */

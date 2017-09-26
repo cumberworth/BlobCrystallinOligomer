@@ -83,6 +83,59 @@ namespace movetype {
         monomer.rotate(m_rot_c, m_rot_mat);
     }
 
+    NTDFlipMovemap::NTDFlipMovemap(Config& config, RandomGens& random_num):
+            Movemap {random_num},
+            m_config {config} {
+
+        m_imat << 1, 0, 0,
+                  0, 1, 0,
+                  0, 0, 1;
+    }
+
+    void NTDFlipMovemap::generate_movemap(Monomer& monomer) {
+        auto particles = monomer.get_particles();
+        vecT plane_normal;
+        auto r = m_random_num.uniform_real();
+        if (r < 0.25) {
+            auto p = particles[0].get();
+            plane_normal = p.get_ore(CoorSet::current).patch_orient;
+            m_point_in_plane = p.get_pos(CoorSet::current);
+        }
+        else if (r < 0.5) {
+            auto p = particles[2].get();
+            plane_normal = p.get_ore(CoorSet::current).patch_norm;
+            m_point_in_plane = p.get_pos(CoorSet::current);
+        }
+        else if (r < 0.75) {
+            auto p1 = particles[0].get();
+            auto p2 = particles[1].get();
+            auto axis = m_config.calc_interparticle_vector(p1, CoorSet::current, p2,
+                    CoorSet::current);
+            axis.normalize();
+            plane_normal = p1.get_ore(CoorSet::current).patch_orient;
+            AngleAxis<distT> angle_axis {M_PI/2, axis};
+            plane_normal = angle_axis.toRotationMatrix()*plane_normal;
+            m_point_in_plane = p1.get_pos(CoorSet::current);
+        }
+        else {
+            auto p1 = particles[2].get();
+            auto p2 = particles[3].get();
+            auto axis = m_config.calc_interparticle_vector(p1, CoorSet::current, p2,
+                    CoorSet::current);
+            axis.normalize();
+            plane_normal = p1.get_ore(CoorSet::current).patch_norm;
+            AngleAxis<distT> angle_axis {M_PI/2, axis};
+            plane_normal = angle_axis.toRotationMatrix()*plane_normal;
+            m_point_in_plane = p1.get_pos(CoorSet::current);
+        }
+        plane_normal.normalize();
+        m_ref_mat = m_imat - 2*plane_normal*plane_normal.transpose();
+    }
+
+    void NTDFlipMovemap::apply_movemap(Monomer& monomer) {
+        monomer.rotate(m_point_in_plane, m_ref_mat);
+    }
+
     MCMovetype::MCMovetype(Config& conf, Energy& ene, RandomGens& random_num,
             InputParams params, string label):
             m_config {conf},
@@ -109,6 +162,10 @@ namespace movetype {
             m_movemap = std::make_unique<RotationMovemap>(
                 params.m_max_disp_rc, params.m_max_disp_a, random_num);
         }
+        else if (movemap_type == "ntdflip") {
+            m_movemap = std::make_unique<NTDFlipMovemap>(conf,
+                random_num);
+        }
     }
 
     bool MetMCMovetype::move() {
@@ -123,6 +180,10 @@ namespace movetype {
         }
         else {
             m.current_to_trial();
+        }
+        if (m.get_particles()[0].get().get_ore(CoorSet::current).patch_norm.norm() > 1.01) {
+            cout << "what\n";
+        m_movemap->apply_movemap(m);
         }
 
         return accepted;
