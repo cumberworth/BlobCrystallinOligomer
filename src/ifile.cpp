@@ -85,7 +85,8 @@ namespace ifile {
 
     void InputEnergyFile::parse_json() {
         json json_potentials {m_energy_json["cgmonomer"]["energy"]["potentials"]};
-        for (auto json_potential: json_potentials) {
+//        for (auto json_potential: json_potentials) {
+        for (auto json_potential: json_potentials[0]) {
             PotentialData pot_data {};
             pot_data.index = json_potential["index"];
             string pot_form {json_potential["form"].get<string>()};
@@ -120,10 +121,11 @@ namespace ifile {
             m_potentials.push_back(pot_data);
         }
         json json_inters {m_energy_json["cgmonomer"]["energy"]["interactions"]};
-        for (auto json_inter: json_inters) {
+//        for (auto json_inter: json_inters) {
+        for (auto json_inter: json_inters[0]) {
             auto raw_pairs {json_inter["pairs"]};
             vector<pair<int, int>> particle_pairs {};
-            for (auto ipair: raw_pairs) {
+            for (auto ipair: raw_pairs[0]) {
                 particle_pairs.emplace_back(ipair[0], ipair[1]);
             }
             int potential {json_inter["potential"]};
