@@ -2,9 +2,9 @@
 # http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
 # But doesn't seem to be working...
 
-OPTLEVEL = -g
+OPTLEVEL = -O3
 BUILDDIR = build
-PREFIX = ../../
+PREFIX = ../..
 TARGET = blobCrystallinOligomer
 TESTTARGET = blobCrystallinOligomer_test
 TARGETDIR = bin
@@ -12,8 +12,8 @@ SRCDIR = src
 TESTDIR = test
 INCLUDEDIR = include
 EXTERNALHEADERS =
-EXTERNALLIBS = -lboost_program_options -lboost_mpi -lboost_serialization
-# For compiling on Dexter (using local Boost installation (I think that's why this is needed))
+EXTERNALLIBS = -lboost_program_options
+# If compiling with custom Boost installation,
 # add -I/home/amc226/include to $(EXTERNALHEADERS)
 # add -L/home/amc226/lib to $(EXTERNALLIBS)
 
@@ -29,7 +29,7 @@ TESTOBJECTS := $(subst .cpp,.o,$(TESTSOURCES))
 TESTOBJECTS := $(subst $(TESTDIR)/,$(BUILDDIR)/,$(TESTOBJECTS))
 TESTOBJECTS += $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 
-CPP = clang++
+CPP = g++
 CPPFLAGS = -I$(INCLUDEDIR) $(EXTERNALHEADERS) $(OPTLEVEL) --std=c++14
 LDFLAGS = $(EXTERNALLIBS) $(OPTLEVEL)
 
@@ -64,6 +64,7 @@ include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(sources))))
 .PHONY: clean install
 clean:
 	rm $(BUILDDIR)/*.o
+	rm .d/*.d
 
 install:
-	cp $(TARGET) $(PREFIX)/bin/$(TARGET)
+	cp $(TARGETDIR)/$(TARGET) $(PREFIX)/bin/$(TARGET)
