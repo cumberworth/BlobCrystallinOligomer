@@ -1,0 +1,90 @@
+{
+    "cgmonomer": {
+        "energy": {
+            "potentials": [
+                {
+                    "form": "OrientedPatchy",
+                    "index": 0,
+                    "parameters": {
+                        "sigl": 12.864577489946498,
+                        "eps": 200,
+                        "rcut": 20,
+                        "siga1": 0.5,
+                        "siga2": 0.5,
+                        "sigt": 1
+                    }
+                }, {
+                    "form": "Patchy",
+                    "index": 1,
+                    "parameters": {
+                        "sigl": 12.864577489946498,
+                        "eps": 50,
+                        "rcut": 20,
+                        "siga1": 0.5,
+                        "siga2": 0.5
+                    }
+                }, {
+                    "form": "Patchy",
+                    "index": 2,
+                    "parameters": {
+                        "sigl": 12.864577489946498,
+                        "eps": 50,
+                        "rcut": 20,
+                        "siga1": 0.5,
+                        "siga2": 0.5
+                    }
+                }, {
+                    "form": "ShiftedLJ",
+                    "index": 3,
+                    "parameters": {
+                        "sigl": 12.864577489946498,
+                        "eps": 0.1,
+                        "rcut": 20
+                    }
+                }, {
+                    "form": "ShiftedLJ",
+                    "index": 4,
+                    "parameters": {
+                        "sigl": 12.864577489946498,
+                        "eps": 0.1,
+                        "rcut": 20
+                    }
+                }, {
+                    "form": "SquareWell",
+                    "index": 5,
+                    "parameters": {
+                        "eps": -5,
+                        "rcut": 15
+                    }
+                }, {
+                    "form": "Zero",
+                    "index": 6
+                }
+            ],
+            "interactions": [
+                {
+                    "pairs": [[0, 0]],
+                    "potential": 0
+                }, {
+                    "pairs": [[1, 1]],
+                    "potential": 1
+                }, {
+                    "pairs": [[2, 2]],
+                    "potential": 2
+                }, {
+                    "pairs": [[3, 3]],
+                    "potential": 3
+                }, {
+                    "pairs": [[4, 4]],
+                    "potential": 5
+                }, {
+                    "pairs": [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]],
+                    "potential": 4
+                }, {
+                    "pairs": [[0, 4], [1, 4], [2, 4], [3, 4]],
+                    "potential": 6
+                }
+            ]
+        }
+    }
+}

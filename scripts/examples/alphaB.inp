@@ -1,0 +1,23 @@
+# System input
+config_filename=alphaB_config.json
+energy_filename=alphaB_pot.json
+temp=1
+
+# Simulation options
+steps=10000000
+max_cutoff=20
+
+# Movetypes
+max_disp_tc=5
+max_disp_rc=1
+max_disp_a=1
+translation_met=1/5
+rotation_met=1/5
+translation_vmmc=1/5
+rotation_vmmc=1/5
+ntd_flip=1/5
+
+# Outpt
+output_filebase=alphaB
+logging_freq=10000
+config_output_freq=10000
