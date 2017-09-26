@@ -18,6 +18,14 @@ If you are need to install it locally on a cluster, follow the Makefile instruct
 
 ### Setting up on Aurora
 
+To compile on aurora, load the following modules
+
+`
+module load GCC/6.4.0-2.28
+module load OpenMPI/2.1.1
+module load Boost/1.65.1
+`
+
 ## Running simulations
 
 Example input files for running simulations can be found in `scripts/examples/`.
