@@ -20,11 +20,11 @@ If you are need to install it locally on a cluster, follow the Makefile instruct
 
 To compile on aurora, load the following modules
 
-`
+```
 module load GCC/6.4.0-2.28
 module load OpenMPI/2.1.1
 module load Boost/1.65.1
-`
+```
 
 ## Running simulations
 
@@ -46,8 +46,8 @@ To watch a simulation live, run
 
 To watch a simulation that has finished, start VMD and run
 
-`
+```
 set libdir [vmd scripts directory]
 set filebase [output filebase
 source [vmd scripts directory]/view_coors.tcl
-`
+```
