@@ -27,10 +27,10 @@ namespace space {
         for (int i {0}; i != 3; i++) {
             distT comp_diff {pos1[i] - pos2[i]};
             if (comp_diff > m_r) {
-                comp_diff = 2*m_r - comp_diff;
+                comp_diff = -2*m_r + comp_diff;
             }
             else if (comp_diff < -m_r) {
-                comp_diff = -2*m_r - comp_diff;
+                comp_diff = 2*m_r + comp_diff;
             }
             diff[i] = comp_diff;
         }
