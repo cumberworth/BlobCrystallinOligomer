@@ -6,6 +6,7 @@ Output in pdb and json format
 """
 
 import argparse
+import random
 
 import numpy as np
 
@@ -21,7 +22,9 @@ def main():
     # Randomly insert into box and accept if there are not overlaps
     for i in range(args.num_particles):
         overlap = True
-        particle = model.SimpleParticle(i, 'PAR', type)
+        pv = random_unit_vector()
+        ov = random_unit_vector()
+        particle = model.OrientedPatchyParticle(i, 'A', type, patch_norm=pv, patch_orient=ov)
         monomer = model.SingleParticleMonomer([particle], args.diameter/2, i)
         while overlap:
             monomer.pos = args.box_len*(np.random.rand(3) - 0.5)
@@ -37,6 +40,25 @@ def main():
     json_file.write(monomers, args.box_len)
 
     return overlap
+
+
+def random_unit_vector():
+    """Return a vector on the unit sphere with uniform probability
+    
+    Taken from Daan's book, which is taken from Allen and Tildesley
+    """
+    ransq = 2.;
+    while ransq >= 1:
+        ran1 = 1 - 2*random.random()
+        ran2 = 1 - 2*random.random()
+        ransq = ran1**2 + ran2**2
+
+    ranh = 2*np.sqrt(1 - ransq)
+    x = ran1*ranh
+    y = ran2*ranh
+    z = 1 - 2*ransq
+
+    return np.array([x, y, z])
 
 
 def parse_cl():

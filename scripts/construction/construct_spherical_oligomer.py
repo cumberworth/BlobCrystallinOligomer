@@ -8,13 +8,14 @@ Output in pdb and json format
 import argparse
 import math
 import sys
+import copy
 
 import numpy as np
 import scipy.optimize as opt
 import transforms3d as trans
 import transforms3d.reflections as refls
 
-import model
+from crystallinpy import model
 
 
 def main():
@@ -28,38 +29,51 @@ def main():
 
     # Calculate ACD-NTD angle
     ntd_length = 2*args.num_ntd_spheres * ntd_radius
-    min_angle = 0
-    max_angle = math.pi - math.acos(-1/3) # This only allows ntds that bulge, unlike in Jehle model
+#    min_angle = 0
+#    max_angle = math.pi - math.acos(-1/3) # This only allows ntds that bulge, unlike in Jehle model
+    min_angle = 0.62
+    max_angle = 0.63
     constants = (acd_radius, ntd_radius, args.num_acd_spheres,
             args.num_ntd_spheres, tet_arm_length)
-    acd_ntd_angle = opt.brentq(construct_acd_ntd_constraint, min_angle,
+    acd_ntd_angle = opt.brentq(construct_oligomer_check_ntd, min_angle,
             max_angle, args=constants)
 
+    # Calculate blob angles
+    #guess = [0, 0]
+    guess = [-0.319, -0.534]
+    constants = (acd_ntd_angle, acd_radius, ntd_radius, args.num_acd_spheres,
+            args.num_ntd_spheres, tet_arm_length)
+    blob_angle1, blob_angle2 = opt.fmin(construct_oligomer_check_blobs, guess,
+            args=constants)
+
     # Build oligomer and write to file
-    monomers = construct_oligomer(acd_ntd_angle, acd_radius, ntd_radius,
-            args.num_acd_spheres, args.num_ntd_spheres, tet_arm_length)
+    monomers = construct_oligomer(acd_radius, ntd_radius,
+            args.num_acd_spheres, args.num_ntd_spheres, tet_arm_length,
+            acd_ntd_angle, blob_angle1, blob_angle2)
+    monomers = modify_structure(monomers)
     pdb_file = model.PDBConfigOutputFile(args.output_filebase + '.pdb')
     pdb_file.write(monomers)
     json_file = model.JSONConfigOutputFile(args.output_filebase + '.json')
-    json_file.write(monomers)
+    json_file.write(monomers, args.box_len)
+    print(acd_ntd_angle, blob_angle1, blob_angle2)
 
     # Simple tetrahedral with same arm length (for aligning in VMD)
-    tetrahedral = construct_tetrahedral(tet_arm_length)
-    pdb_file = model.PDBConfigOutputFile(args.output_filebase + '_centers.pdb')
-    pdb_file.write(tetrahedral)
+    #tetrahedral = construct_tetrahedral(tet_arm_length)
+    #pdb_file = model.PDBConfigOutputFile(args.output_filebase + '_centers.pdb')
+    #pdb_file.write(tetrahedral)
 
 
-def construct_acd_ntd_constraint(acd_ntd_angle, acd_radius, ntd_radius,
+def construct_oligomer_check_ntd(acd_ntd_angle, acd_radius, ntd_radius,
             num_acd_spheres, num_ntd_spheres, tet_arm_length):
-    """Build construct and output a distance that should be 0.
+    """Build construct and output distance between adjacent NTDs
 
-    The distance is dependent on the ACD-NTD angle. The derived relationship
-    is wrong so I have to do this to correct the resultant angle.
+    The distance is dependent on the ACD-NTD angle.
     """
 
     # Build oligomer
-    monomers = construct_oligomer(acd_ntd_angle, acd_radius, ntd_radius,
-            num_acd_spheres, num_ntd_spheres, tet_arm_length)
+    monomers = construct_oligomer(acd_radius, ntd_radius,
+            num_acd_spheres, num_ntd_spheres, tet_arm_length, acd_ntd_angle,
+            0, 0)
 
     # Select two particles that should be touching at the NTD-NTD nexus
     particle1 = monomers[0].ntd_particles[-1]
@@ -70,8 +84,33 @@ def construct_acd_ntd_constraint(acd_ntd_angle, acd_radius, ntd_radius,
     return res
 
 
+def construct_oligomer_check_blobs(angles, acd_ntd_angle, acd_radius, ntd_radius,
+            num_acd_spheres, num_ntd_spheres, tet_arm_length):
+    """Build construct and output distance between overlapping blobs 
+
+    The distance is dependent on the ACD-NTD angle.
+    """
+    blob_angle1, blob_angle2 = angles
+
+    # Build oligomer
+    monomers = construct_oligomer(acd_radius, ntd_radius,
+            num_acd_spheres, num_ntd_spheres, tet_arm_length, acd_ntd_angle,
+            blob_angle1, blob_angle2)
+
+    blob1 = monomers[0].blob_particles[0]
+    blob2 = monomers[3].blob_particles[0]
+#    blob3 = monomers[7].blob_particles[0]
+#    blob4 = monomers[10].blob_particles[0]
+#    blob5 = monomers[20].blob_particles[0]
+    blob6 = monomers[23].blob_particles[0]
+    dist1 = np.linalg.norm(blob1.pos - blob2.pos)
+    dist2 = np.linalg.norm(blob1.pos - blob6.pos)
+
+    return dist1 + dist2
+
+
 def construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
-        num_ntd_spheres, acd_ntd_angle):
+        num_ntd_spheres, num_monomers, acd_ntd_angle, blob_angle1, blob_angle2):
     """Construct monomers given number of particles for ACD and NTD.
 
     Internaly are some descisions about the kind of particles involved (i.e.,
@@ -80,44 +119,49 @@ def construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
     probably want to reconsider those patch choices.
     """
     monomers = []
-    for monomer_i in range(24):
+    for monomer_i in range(num_monomers):
         acd_particles = []
         particle_i = 0
+        ptype = 0
         for j in range(num_acd_spheres):
 
             # Note patch orientation is tied to the way the particles are later
             # oriented
             if j == 0:
                 particle = model.OrientedPatchyParticle(particle_i, 'ACD',
-                        patch_norm=np.array([0., -1., 0.]),
+                        ptype, patch_norm=np.array([0., -1., 0.]),
                         patch_orient=np.array([1., 0., 0.]))
             else:
                 particle = model.PatchyParticle(particle_i, 'ACD',
-                        patch_norm=np.array([-1., 0., 0.]))
+                        ptype, patch_norm=np.array([-1., 0., 0.]))
 
             particle_i += 1
             acd_particles.append(particle)
+            ptype += 1
 
         ntd_particles = []
         for j in range(num_ntd_spheres):
             if j == 0:
                 particle = model.PatchyParticle(particle_i, 'NTD',
-                        patch_norm=[-1., 0., 0.])
+                        ptype, patch_norm=[-1., 0., 0.])
             else:
-                particle = model.SimpleParticle(particle_i, 'NTD')
+                particle = model.SimpleParticle(particle_i, 'NTD', ptype)
 
             particle_i += 1
             ntd_particles.append(particle)
+            ptype += 1
+
+        blob_particles = [model.SimpleParticle(particle_i, 'BLB', ptype)]
 
         monomer = model.AlphaBMonomer(acd_particles, ntd_particles, acd_radius,
-                ntd_radius, monomer_i)
-        monomer = orient_monomer(monomer, acd_ntd_angle)
+                ntd_radius, blob_particles, monomer_i)
+        monomer = orient_monomer(monomer, acd_ntd_angle, blob_angle1, blob_angle2)
         monomers.append(monomer)
 
     return monomers
 
 
-def orient_monomer(monomer, acd_ntd_angle):
+def orient_monomer(monomer, acd_ntd_angle, blob_angle1, blob_angle2):
     """Orient a monomer to have given ACD-NTD angle"""
 
     # Place particles along y axis with edge of first sphere touching origin
@@ -157,6 +201,21 @@ def orient_monomer(monomer, acd_ntd_angle):
         particle.apply_transformation(ntd_transform)
         p_i += 1
 
+    # Place the blob particle along y axis then rotate
+    last_ntd_pos = monomer.ntd_particles[-1].pos
+    blob_rotation1 = trans.axangles.axangle2aff([1, 0, 0],
+            blob_angle1, last_ntd_pos)
+    blob_rotation2 = trans.axangles.axangle2aff([0, 1, 0],
+            blob_angle2, last_ntd_pos)
+    blob_transform = blob_rotation1.dot(blob_rotation2)
+    particle = monomer.blob_particles[0]
+    pos = particle.pos
+    pos[1] += (2*(p_i - 1)*monomer.ntd_radius + 2*monomer.acd_radius +
+            1.5*monomer.ntd_radius)
+    particle.pos = pos
+    particle.apply_transformation(ntd_transform)
+    particle.apply_transformation(blob_transform)
+
     # Prepare patches
     #z_axis_angle = -math.pi/2
     #y_axis = np.array([0, 1, 0])
@@ -190,16 +249,19 @@ def construct_dimer(monomer1, monomer2):
     # Get angle by taking dot product of z axis and zx plane projection of the
     # ntd position, dividing by the zx plane projection norm, and taking the
     # inverse cos of the result
-    y_axis = np.array([0, 1, 0])
-    x_comp = monomer1.ntd_particles[0].pos[0]
-    z_comp = monomer1.ntd_particles[0].pos[2]
-    xz_proj = np.array([x_comp, 0, z_comp])
-    xz_proj_norm = np.linalg.norm(xz_proj)
-    y_axis_angle = 2*math.acos(np.dot(z_axis, xz_proj)/xz_proj_norm)
-    y_rotation = trans.axangles.axangle2aff(y_axis, y_axis_angle)
+    #y_axis = np.array([0, 1, 0])
+    #x_comp = monomer1.ntd_particles[0].pos[0]
+    #z_comp = monomer1.ntd_particles[0].pos[2]
+    #xz_proj = np.array([x_comp, 0, z_comp])
+    #xz_proj_norm = np.linalg.norm(xz_proj)
+    #y_axis_angle = 2*math.acos(np.dot(z_axis, xz_proj)/xz_proj_norm)
+    #y_rotation = trans.axangles.axangle2aff(y_axis, y_axis_angle)
 
-    rotation = np.dot(y_rotation, z_rotation)
-    monomer2.apply_transformation(rotation)
+    #rotation = np.dot(y_rotation, z_rotation)
+    #monomer2.apply_transformation(rotation)
+
+    reflection = refls.rfnorm2aff([0, 1, 0])
+    monomer2.apply_transformation(reflection)
 
     return (monomer1, monomer2)
 
@@ -325,11 +387,11 @@ def construct_tetrahedral_hexamers(hexamers, arm_length):
     return hexamers
 
 
-def construct_oligomer(acd_ntd_angle, acd_radius, ntd_radius, num_acd_spheres,
-        num_ntd_spheres, tet_arm_length):
+def construct_oligomer(acd_radius, ntd_radius, num_acd_spheres,
+        num_ntd_spheres, tet_arm_length, acd_ntd_angle, blob_angle1, blob_angle2):
 
     monomers = construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
-            num_ntd_spheres, acd_ntd_angle)
+            num_ntd_spheres, 24, acd_ntd_angle, blob_angle1, blob_angle2)
     dimers = []
     for i in range(0, len(monomers), 2):
         monomer1 = monomers[i]
@@ -343,6 +405,23 @@ def construct_oligomer(acd_ntd_angle, acd_radius, ntd_radius, num_acd_spheres,
         hexamers.append(hexamer)
 
     construct_tetrahedral_hexamers(hexamers, tet_arm_length)
+
+    return monomers
+
+
+def modify_structure(monomers):
+    # Add another dimer
+    m1 = copy.deepcopy(monomers[0])
+    m1.index = 24
+    m2 = copy.deepcopy(monomers[1])
+    m2.index = 25
+    rot_c = m1.blob_particles[0].pos
+    rot_axis = [1, 0, 0]
+    rot = trans.axangles.axangle2aff(rot_axis, math.pi,
+            rot_c)
+    m1.apply_transformation(rot)
+    m2.apply_transformation(rot)
+    monomers.extend([m1, m2])
 
     return monomers
 
@@ -362,6 +441,10 @@ def parse_cl():
         "arm_to_edge",
         type=float,
         help="Tetrahedral arm to triangle edge ratio")
+    parser.add_argument(
+        "box_len",
+        type=float,
+        help="Box length")
     parser.add_argument(
         "output_filebase",
         type=str,

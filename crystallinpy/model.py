@@ -13,6 +13,7 @@ import string
 
 import numpy as np
 import transforms3d.affines as affines
+import transforms3d.zooms as zooms
 
 
 def hard_sphere_overlap(new_monomer, monomers, diameter, space):
@@ -41,7 +42,7 @@ class CuboidPBC:
     def calc_diff(self, pos1, pos2):
         diff = np.zeros(3)
         for i in range(3):
-            comp_diff = pos2[i] - pos1[i]
+            comp_diff = pos1[i] - pos2[i]
             if comp_diff > self.r:
                 comp_diff = -2*self.r + comp_diff
             elif comp_diff < -self.r:
@@ -53,6 +54,15 @@ class CuboidPBC:
 
     def calc_dist(self, pos1, pos2):
         return np.linalg.norm(self.calc_diff(pos1, pos2))
+
+    def wrap(self, pos):
+        for i in range(3):
+            if pos[i] > self.r:
+                pos[i] = -2*self.r + pos[i]
+            elif pos[i] < -self.r:
+                pos[i] = 2*self.r + pos[i]
+
+        return pos
 
 
 class Monomer:
@@ -133,22 +143,29 @@ class AlphaBMonomer(Monomer):
     """
 
     def __init__(self, acd_particles, ntd_particles, acd_radius, ntd_radius,
-            index):
+            blob_particles, index):
         self._acd_particles = acd_particles
         self._ntd_particles = ntd_particles
-        self._particles = acd_particles + ntd_particles
+        self._blob_particles = blob_particles
+        self._particles = acd_particles + ntd_particles + blob_particles
+        super().__init__(self._particles, index)
         self._acd_radius = acd_radius
         self._ntd_radius = ntd_radius
         self._index = index
-        self._num_particles = len(acd_particles) + len(ntd_particles)
 
         self._num_acd_particles = len(acd_particles)
         self._num_ntd_particles = len(ntd_particles)
-        self._num_particles = self._num_acd_particles + self._num_ntd_particles
+        self._num_blob_particles = len(blob_particles)
+        self._num_particles = (self._num_acd_particles + self._num_ntd_particles +
+                self._num_blob_particles)
 
     @property
     def index(self):
         return self._index
+
+    @index.setter
+    def index(self, i):
+        self._index = i
 
     @property
     def radius(self):
@@ -169,6 +186,10 @@ class AlphaBMonomer(Monomer):
     @property
     def ntd_particles(self):
         return self._ntd_particles
+    
+    @property
+    def blob_particles(self):
+        return self._blob_particles
     
     @property
     def acd_center(self):
@@ -237,8 +258,9 @@ class PatchyParticle(SimpleParticle):
         """Apply the transformation matrix to all position vectors."""
 
         super().apply_transformation(M)
-        translation, rotation, z, s = affines.decompose(M)
-        self._patch_norm = np.dot(rotation, self._patch_norm)
+        translation, rotation, zoom, shear = affines.decompose(M)
+        transform = affines.compose(np.zeros(3), rotation, zoom, shear)[:3, :3]
+        self._patch_norm = np.dot(transform, self._patch_norm)
 
 
 class OrientedPatchyParticle(PatchyParticle):
@@ -261,8 +283,9 @@ class OrientedPatchyParticle(PatchyParticle):
         """Apply the transformation matrix to all position vectors."""
 
         super().apply_transformation(M)
-        translation, rotation, z, s = affines.decompose(M)
-        self._patch_orient = np.dot(rotation, self._patch_orient)
+        translation, rotation, zoom, shear = affines.decompose(M)
+        transform = affines.compose(np.zeros(3), rotation, zoom, shear)[:3, :3]
+        self._patch_orient = np.dot(transform, self._patch_orient)
 
 
 class PDBConfigOutputFile:
