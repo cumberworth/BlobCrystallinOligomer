@@ -12,6 +12,7 @@ namespace param {
     using shared_types::eneT;
     using shared_types::distT;
     using shared_types::stepT;
+    using shared_types::timeT;
     using std::string;
 
     /** Parse fractions in strings
@@ -41,6 +42,7 @@ namespace param {
 
             // Simulation options
             stepT m_steps;
+            timeT m_duration;
             distT m_max_cutoff; // Not very nice to put here
 
             // Movetypes

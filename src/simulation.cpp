@@ -1,5 +1,6 @@
 // simulation.cpp
 
+#include <chrono>
 #include <iostream>
 
 #include "BlobCrystallinOligomer/simulation.h"
@@ -8,13 +9,18 @@ namespace simulation {
 
     using movetype::MetMCMovetype;
     using movetype::VMMCMovetype;
+    using std::chrono::steady_clock;
     using std::cout;
     using std::setw;
 
     NVTMCSimulation::NVTMCSimulation(Config& conf, Energy& ene,
             InputParams params, RandomGens& random_num):
-            m_config {conf}, m_energy {ene}, m_random_num {random_num},
-            m_beta {1/params.m_temp}, m_steps {params.m_steps},
+            m_config {conf},
+            m_energy {ene},
+            m_random_num {random_num},
+            m_beta {1/params.m_temp},
+            m_steps {params.m_steps},
+            m_duration {params.m_duration},
             m_logging_freq {params.m_logging_freq},
             m_config_output_freq {params.m_config_output_freq},
             m_op_output_freq {params.m_op_output_freq},
@@ -29,13 +35,23 @@ namespace simulation {
     }
 
     void NVTMCSimulation::run() {
+        auto start = steady_clock::now();
         for (stepT step {1}; step != (m_steps + 1); step++) {
+
             // Do a move
             int movetype_i {select_movetype()};
             MCMovetype& movetype {*m_movetypes[movetype_i]};
             bool accepted {movetype.move()};
             m_move_attempts[movetype_i]++;
             m_move_accepts[movetype_i] += accepted;
+
+            // Check if maximum allowed time reached
+            std::chrono::duration<double> dt {(steady_clock::now() -
+                    start)};
+            if (dt.count() > m_duration) {
+                cout << "Maximum time allowed reached\n";
+                break;
+            }
 
             // Log
             if (m_logging_freq and step % m_logging_freq == 0) {

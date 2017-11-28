@@ -70,7 +70,10 @@ namespace param {
         sim_options.add_options()
             ("steps",
                 po::value<stepT>(&m_steps)->default_value(0),
-                "Number of steps")
+                "Maximum number of steps")
+            ("duration",
+                po::value<timeT>(&m_duration)->default_value(0),
+                "Maximum duration")
             ("max_cutoff",
                 po::value<distT>(&m_max_cutoff)->default_value(0),
                 "Maximum cutoff value of any included potential")

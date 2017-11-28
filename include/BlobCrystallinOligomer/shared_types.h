@@ -14,6 +14,7 @@ namespace shared_types {
     typedef double distT;
     typedef double eneT;
     typedef unsigned long long int stepT;
+    typedef double timeT;
     const double inf {std::numeric_limits<double>::infinity()};
 
     /** For specifying which particle coordinate set to use: current or trial */

@@ -62,6 +62,7 @@ namespace simulation {
             vector<stepT> m_move_accepts;
 
             stepT m_steps;
+            stepT m_duration;
             stepT m_logging_freq;
             stepT m_config_output_freq;
             stepT m_op_output_freq;
