@@ -34,6 +34,10 @@ namespace monomer {
         return m_index;
     }
 
+    Particle& Monomer::get_particle(int particle_index) {
+        return *m_particles[particle_index];
+    }
+    
     particleArrayT Monomer::get_particles() {
         return m_particle_refs;
     }

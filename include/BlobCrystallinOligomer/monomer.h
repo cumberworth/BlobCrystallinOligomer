@@ -42,6 +42,9 @@ namespace monomer {
             /** Unique index */
             int get_index();
 
+            /** Get specified particle */
+            Particle& get_particle(int particle_i);
+
             /** Get all particles */
             particleArrayT get_particles();
 
