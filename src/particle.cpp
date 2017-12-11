@@ -45,7 +45,7 @@ namespace particle {
         }
     }
 
-    void Particle::set_pos(vecT& pos) {
+    void Particle::set_pos(vecT pos) {
         m_pos = pos;
     }
 

@@ -84,6 +84,16 @@ namespace config {
                     Monomer& monomer2,
                     CoorSet& coorset2);
 
+            /** Update config positions only
+              *
+              * This method is to allow configurations to be read in from file
+              * and have the particle positions updated. The position vector
+              * must be in the order they would be written in. A plain vector
+              * is used for input instead of an eigen vector for ease of 
+              * compatibility with the cython analysis wrapper.
+              */
+            void update_config_positions(vector<vector<double>> positions);
+
         private:
             vector<unique_ptr<Monomer>> m_monomers;
             monomerArrayT m_monomer_refs;

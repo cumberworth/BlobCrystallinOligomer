@@ -101,6 +101,17 @@ namespace config {
         return m_space.calc_dist(pos1, pos2);
     }
 
+    void Config::update_config_positions(vector<vector<double>> positions) {
+        int pos_i {0};
+        for (auto monomer: m_monomer_refs) {
+            auto particles {monomer.get().get_particles()};
+            for (auto particle: particles) {
+                vecT pos {positions[pos_i]};
+                particle.get().set_pos(pos);
+            }
+        }
+    }
+
     void Config::create_monomers(vector<MonomerData> monomers) {
         for (auto m_data: monomers) {
             m_monomers.emplace_back(make_unique<Monomer>(m_data, m_space));

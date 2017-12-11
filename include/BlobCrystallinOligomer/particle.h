@@ -41,7 +41,7 @@ namespace particle {
             Orientation& get_ore(CoorSet coorset);
 
             /** Set the current position */
-            void set_pos(vecT& pos);
+            void set_pos(vecT pos);
 
             /** Translate particle by given vector and store as trial*/
             void translate(vecT& disv);
