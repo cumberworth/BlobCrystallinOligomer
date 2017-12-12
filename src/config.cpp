@@ -66,6 +66,10 @@ namespace config {
         return num_parts;
     }
 
+    int Config::get_num_monomers() {
+        return m_monomers.size();
+    }
+
     distT Config::get_box_len() {
         return m_box_len;
     }
@@ -106,8 +110,12 @@ namespace config {
         for (auto monomer: m_monomer_refs) {
             auto particles {monomer.get().get_particles()};
             for (auto particle: particles) {
-                vecT pos {positions[pos_i]};
+                vecT pos;
+                for (int i {0}; i != 3; i++) {
+                   pos[i] =  positions[pos_i][i];
+                }
                 particle.get().set_pos(pos);
+                pos_i++;
             }
         }
     }

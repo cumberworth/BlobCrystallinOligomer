@@ -1,11 +1,11 @@
 """Classes for CG modeling of alpha crystallin monomers.
 
-Some parallels to the classes used in the C++ implementation, but should not
-assume the structure is the same. These classes are meant to be used in analysis
-scripts and file conversions.
+I have now wrapped the core model elements of the C++ code, which should be
+for analysis scripts.
 
-The alternative is wrapping the relevant parts of the C++ version in cython,
-which is probably more work.
+Some parallels to the classes used in the C++ implementation, but should not
+assume the structure is the same. These classes mainly for use in construction
+scripts and file conversions because of the greater flexibility.
 """
 
 import json

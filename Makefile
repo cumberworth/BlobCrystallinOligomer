@@ -30,7 +30,7 @@ TESTOBJECTS := $(subst $(TESTDIR)/,$(BUILDDIR)/,$(TESTOBJECTS))
 TESTOBJECTS += $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 
 CPP = g++
-CPPFLAGS = -I$(INCLUDEDIR) $(EXTERNALHEADERS) $(OPTLEVEL) --std=c++14
+CPPFLAGS = -I$(INCLUDEDIR) $(EXTERNALHEADERS) $(OPTLEVEL) --std=c++14 -fPIC
 LDFLAGS = $(EXTERNALLIBS) $(OPTLEVEL)
 
 DEPDIR = .d
@@ -61,10 +61,13 @@ $(DEPDIR)/%.d: ;
 
 include $(wildcard $(patsubst %,$(DEPDIR)/%.d,$(basename $(sources))))
 
-.PHONY: clean install
+.PHONY: clean install archive
 clean:
 	rm $(BUILDDIR)/*.o
 	rm .d/*.d
 
 install:
 	cp $(TARGETDIR)/$(TARGET) $(PREFIX)/bin/$(TARGET)
+
+archive:
+	ar -r lib/$(TARGET).a $(BUILDDIR)/*.o

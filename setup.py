@@ -4,9 +4,9 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 
 extensions = [
-    Extension('*', ['*.pyx'],
-            include_dirs=['../include'],
-            extra_objects=['../lib/blobCrystallinOligomer.a'],
+    Extension('*', ['crystallinpy/*.pyx'],
+            include_dirs=['include'],
+            extra_objects=['lib/blobCrystallinOligomer.a'],
             language='c++',
             extra_compile_args=['-O3'])
 ]

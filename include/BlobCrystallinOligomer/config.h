@@ -54,6 +54,8 @@ namespace config {
 
             int get_num_particles();
 
+            int get_num_monomers();
+
             /** This assumes cuboid geometry */
             distT get_box_len();
 

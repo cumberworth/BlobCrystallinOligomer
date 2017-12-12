@@ -3,7 +3,7 @@ from libcpp.vector cimport vector
 
 from shared_types_c cimport *
 
-cdef extern from "../include/BlobCrystallinOligomer/ifile.h" namespace "ifile":
+cdef extern from "BlobCrystallinOligomer/ifile.h" namespace "ifile":
     cdef struct MonomerData:
         pass
 

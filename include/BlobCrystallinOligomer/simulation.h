@@ -26,6 +26,7 @@ namespace simulation {
     using random_gens::RandomGens;
     using shared_types::eneT;
     using shared_types::stepT;
+    using shared_types::timeT;
     using std::unique_ptr;
     using std::string;
     using std::vector;
@@ -62,7 +63,7 @@ namespace simulation {
             vector<stepT> m_move_accepts;
 
             stepT m_steps;
-            stepT m_duration;
+            timeT m_duration;
             stepT m_logging_freq;
             stepT m_config_output_freq;
             stepT m_op_output_freq;
