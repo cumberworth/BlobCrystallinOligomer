@@ -7,3 +7,7 @@ bin/
 build/
 localtests/
 *__pycache__/
+*.so
+lib/
+crystallinpy/*cpp
+crystallinpy/cython_debug

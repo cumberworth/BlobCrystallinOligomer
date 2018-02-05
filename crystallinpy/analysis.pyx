@@ -11,11 +11,13 @@ from monomer import Monomer
 def calc_interface_timeseries(Config config, VTFInputFile trajfile):
     """Calculate number of primary and secondary interfaces per timestep"""
     cdef double cutoff = 2*config.get_radius() + 1
+    cdef double blob_cutoff = 15
     cdef list primary_interfaces = []
     cdef list secondary_interfaces = []
+    cdef list ntd_interfaces = []
     cdef int i
     cdef int num_configs = trajfile.num_configs
-    for i in range(num_configs):
+    for i in range(num_configs - 1):
         positions = trajfile.get_config_positions(i)
         config.update_config_positions(positions)
 
@@ -32,4 +34,9 @@ def calc_interface_timeseries(Config config, VTFInputFile trajfile):
         secondary_count = np.sum(np.logical_and(interacts1, interacts2))
         secondary_interfaces.append(secondary_count)
 
-    return primary_interfaces, secondary_interfaces
+        # Calculate number of NTD interfaces
+        dists4 = config.calc_dist_pairs(4)
+        interacts4 = dists4 < blob_cutoff
+        ntd_interfaces.append(np.sum(interacts4))
+
+    return primary_interfaces, secondary_interfaces, ntd_interfaces
