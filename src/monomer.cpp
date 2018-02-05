@@ -17,6 +17,7 @@ namespace monomer {
 
     Monomer::Monomer(MonomerData m_data, CuboidPBC& pbc_space):
             m_index {m_data.index},
+            m_conformer {m_data.conformer},
             m_space {pbc_space} {
 
         create_particles(m_data.particles, pbc_space);
@@ -32,6 +33,10 @@ namespace monomer {
 
     int Monomer::get_index() {
         return m_index;
+    }
+
+    int Monomer::get_conformer() {
+        return m_conformer;
     }
 
     Particle& Monomer::get_particle(int particle_index) {
@@ -75,6 +80,10 @@ namespace monomer {
             Particle& particle {m_particle_refs[i].get()};
             particle.rotate(rot_c, rot_mat);
         }
+    }
+
+    void Monomer::flip_conformation() {
+        m_conformer *= -1;
     }
 
     void Monomer::current_to_trial() {

@@ -44,6 +44,7 @@ namespace ifile {
         m_radius = m_config_json["cgmonomer"]["radius"];
         for (auto json_monomer: m_config_json["cgmonomer"]["config"]) {
             int monomer_index {json_monomer["index"]};
+            int conformer {json_monomer["conformer"]};
             vector<ParticleData> particles {};
             for (auto json_particle: json_monomer["particles"]) {
                 int p_index {json_particle["index"]};
@@ -64,7 +65,7 @@ namespace ifile {
                     patch_orient};
                 particles.push_back(p_data);
             }
-            MonomerData m_data {monomer_index, particles};
+            MonomerData m_data {monomer_index, conformer, particles};
             m_monomers.push_back(m_data);
         }
     }
@@ -79,8 +80,12 @@ namespace ifile {
         return m_potentials;
     }
 
-    vector<InteractionData> InputEnergyFile::get_interactions() {
-        return m_interactions;
+    vector<InteractionData> InputEnergyFile::get_same_conformers_interactions() {
+        return m_same_conformers_interactions;
+    }
+
+    vector<InteractionData> InputEnergyFile::get_different_conformers_interactions() {
+        return m_different_conformers_interactions;
     }
 
     void InputEnergyFile::parse_json() {
@@ -129,8 +134,18 @@ namespace ifile {
                 particle_pairs.emplace_back(ipair[0], ipair[1]);
             }
             int potential {json_inter["potential"]};
+            string conformers {json_inter["conformers"].get<string>()};
             InteractionData i_data {particle_pairs, potential};
-            m_interactions.push_back(i_data);
+            if (conformers == "any") {
+                m_same_conformers_interactions.push_back(i_data);
+                m_different_conformers_interactions.push_back(i_data);
+            }
+            else if (conformers == "same") {
+                m_same_conformers_interactions.push_back(i_data);
+            }
+            else if (conformers == "different") {
+                m_different_conformers_interactions.push_back(i_data);
+            }
         }
     }
 }

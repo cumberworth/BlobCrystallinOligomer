@@ -154,7 +154,7 @@ def construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
         blob_particles = [model.SimpleParticle(particle_i, 'BLB', ptype)]
 
         monomer = model.AlphaBMonomer(acd_particles, ntd_particles, acd_radius,
-                ntd_radius, blob_particles, monomer_i)
+                ntd_radius, blob_particles, monomer_i, 1)
         monomer = orient_monomer(monomer, acd_ntd_angle, blob_angle1, blob_angle2)
         monomers.append(monomer)
 

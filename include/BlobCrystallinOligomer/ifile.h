@@ -43,6 +43,7 @@ namespace ifile {
     /** For passing monomer data to the config class */
     struct MonomerData {
         int index;
+        int conformer;
         vector<ParticleData> particles;
     };
 
@@ -88,12 +89,14 @@ namespace ifile {
         public:
             InputEnergyFile(string filename);
             vector<PotentialData> get_potentials();
-            vector<InteractionData> get_interactions();
+            vector<InteractionData> get_same_conformers_interactions();
+            vector<InteractionData> get_different_conformers_interactions();
 
         private:
             json m_energy_json;
             vector<PotentialData> m_potentials {};
-            vector<InteractionData> m_interactions {};
+            vector<InteractionData> m_same_conformers_interactions {};
+            vector<InteractionData> m_different_conformers_interactions {};
 
             void parse_json();
 

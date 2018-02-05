@@ -143,7 +143,7 @@ class AlphaBMonomer(Monomer):
     """
 
     def __init__(self, acd_particles, ntd_particles, acd_radius, ntd_radius,
-            blob_particles, index):
+            blob_particles, index, conformer):
         self._acd_particles = acd_particles
         self._ntd_particles = ntd_particles
         self._blob_particles = blob_particles
@@ -152,6 +152,7 @@ class AlphaBMonomer(Monomer):
         self._acd_radius = acd_radius
         self._ntd_radius = ntd_radius
         self._index = index
+        self._conformer = conformer
 
         self._num_acd_particles = len(acd_particles)
         self._num_ntd_particles = len(ntd_particles)
@@ -200,6 +201,10 @@ class AlphaBMonomer(Monomer):
         center /= self._num_acd_particles
 
         return center
+
+    @property
+    def conformer(self):
+        return self._conformer
 
 
 class SimpleParticle:
@@ -419,6 +424,7 @@ class JSONConfigOutputFile:
         for monomer in monomers:
             monomer_json = {}
             monomer_json['index'] = monomer.index
+            monomer_json['conformer'] = monomer.conformer
             monomer_json['particles'] = []
             for particle in monomer:
                 particle_json = {}

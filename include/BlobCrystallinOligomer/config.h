@@ -40,7 +40,7 @@ namespace config {
       */
     class Config {
         public:
-            Config(InputParams params, RandomGens& random_num);
+            Config(InputParams& params, RandomGens& random_num);
             Config(vector<MonomerData> monomers, RandomGens& random_num,
                     distT box_len, distT radius);
 

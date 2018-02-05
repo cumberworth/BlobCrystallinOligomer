@@ -20,14 +20,18 @@ namespace energy {
     using shared_types::vecT;
     using std::cout;
 
-    Energy::Energy(Config& conf, InputParams params):
+    Energy::Energy(Config& conf, InputParams& params):
             m_config {conf},
             m_max_cutoff {params.m_max_cutoff} {
 
         InputEnergyFile energy_file {params.m_energy_filename};
         vector<PotentialData> potentials {energy_file.get_potentials()};
-        vector<InteractionData> interactions {energy_file.get_interactions()};
-        create_potentials(potentials, interactions);
+        vector<InteractionData> same_conformers_interactions {
+                energy_file.get_same_conformers_interactions()};
+        vector<InteractionData> different_conformers_interactions {
+                energy_file.get_different_conformers_interactions()};
+        create_potentials(potentials, same_conformers_interactions,
+                different_conformers_interactions);
         eneT total_ene {calc_total_energy()};
         if (total_ene == inf or total_ene != total_ene) {
             cout << "Bad starting configuration\n";
@@ -58,7 +62,9 @@ namespace energy {
         particleArrayT particles2 {monomer2.get_particles()};
         for (Particle& p1: particles1) {
             for (Particle& p2: particles2) {
-                eneT part_ene {calc_particle_pair_energy(p1, coorset1, p2, coorset2)};
+                eneT part_ene {calc_particle_pair_energy(p1,
+                        monomer1.get_conformer(), coorset1, p2,
+                        monomer2.get_conformer(), coorset2)};
                 if (part_ene == inf) {
                     return inf;
                 }
@@ -80,8 +86,9 @@ namespace energy {
         particleArrayT particles2 {monomer2.get_particles()};
         for (Particle& p1: particles1) {
             for (Particle& p2: particles2) {
-                bool p_interacting {particles_interacting(p1, coorset1, p2,
-                        coorset2)};
+                bool p_interacting {particles_interacting(p1,
+                        monomer1.get_conformer(), coorset1, p2,
+                        monomer2.get_conformer(), coorset2)};
                 if (p_interacting) {
                     m_interacting = true;
                     return m_interacting;
@@ -144,20 +151,27 @@ namespace energy {
         return de;
     }
 
-    bool Energy::particles_interacting(Particle& particle1, CoorSet coorset1,
-            Particle& particle2, CoorSet coorset2) {
+    bool Energy::particles_interacting(Particle& particle1, int conformer1,
+            CoorSet coorset1, Particle& particle2, int conformer2,
+            CoorSet coorset2) {
 
         distT dist {m_config.calc_dist(particle1, coorset1, particle2, coorset2)};
         pair<int, int> key {particle1.get_type(), particle2.get_type()};
-
-        PairPotential& pot {m_pair_to_pot.at(key).get()};
-        bool interacting {pot.particles_interacting(dist)};
+        PairPotential* pot;
+        if (conformer1 == conformer2) {
+            pot = &(m_same_pair_to_pot.at(key).get());
+        }
+        else {
+            pot = &(m_different_pair_to_pot.at(key).get());
+        }
+        bool interacting {pot->particles_interacting(dist)};
 
         return interacting;
     }
 
-    eneT Energy::calc_particle_pair_energy(Particle& particle1, CoorSet coorset1,
-            Particle& particle2, CoorSet coorset2) {
+    eneT Energy::calc_particle_pair_energy(Particle& particle1, int conformer1,
+            CoorSet coorset1, Particle& particle2, int conformer2,
+            CoorSet coorset2) {
 
         vecT diff {m_config.calc_interparticle_vector(particle2, coorset2,
                 particle1, coorset1)};
@@ -166,14 +180,21 @@ namespace energy {
         auto p2_ore {particle2.get_ore(coorset1)};
         pair<int, int> key {particle1.get_type(), particle2.get_type()};
 
-        PairPotential& pot {m_pair_to_pot.at(key).get()};
-        eneT ene {pot.calc_energy(dist, diff, p1_ore, p2_ore)};
+        PairPotential* pot;
+        if (conformer1 == conformer2) {
+            pot = &(m_same_pair_to_pot.at(key).get());
+        }
+        else {
+            pot = &(m_different_pair_to_pot.at(key).get());
+        }
+        eneT ene {pot->calc_energy(dist, diff, p1_ore, p2_ore)};
 
         return ene;
     }
 
     void Energy::create_potentials(vector<PotentialData> potentials,
-            vector<InteractionData> interactions) {
+            vector<InteractionData> same_conformers_interactions,
+            vector<InteractionData> different_conformers_interactions) {
 
         for (auto p_data: potentials) {
             PairPotential* pot;
@@ -202,12 +223,21 @@ namespace energy {
             m_potentials.emplace_back(pot);
         }
 
-        for (auto i_data: interactions) {
+        for (auto i_data: same_conformers_interactions) {
             for (auto p_pair: i_data.particle_pairs) {
                 PairPotential& pot {*m_potentials[i_data.potential_index]};
-                m_pair_to_pot.emplace(p_pair, pot);
+                m_same_pair_to_pot.emplace(p_pair, pot);
                 pair<int, int> reversed_p_pair {p_pair.second, p_pair.first};
-                m_pair_to_pot.emplace(reversed_p_pair, pot);
+                m_same_pair_to_pot.emplace(reversed_p_pair, pot);
+            }
+        }
+
+        for (auto i_data: different_conformers_interactions) {
+            for (auto p_pair: i_data.particle_pairs) {
+                PairPotential& pot {*m_potentials[i_data.potential_index]};
+                m_different_pair_to_pot.emplace(p_pair, pot);
+                pair<int, int> reversed_p_pair {p_pair.second, p_pair.first};
+                m_different_pair_to_pot.emplace(reversed_p_pair, pot);
             }
         }
     }

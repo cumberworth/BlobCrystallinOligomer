@@ -42,6 +42,9 @@ namespace monomer {
             /** Unique index */
             int get_index();
 
+            /** Conformer (two NTD configs) */
+            int get_conformer();
+
             /** Get specified particle */
             Particle& get_particle(int particle_i);
 
@@ -62,6 +65,9 @@ namespace monomer {
             /** Rotate monomer by given ? around given origin */
             void rotate(vecT rot_c, rotMatT rot_mat);
 
+            /** Flip conformation */
+            void flip_conformation();
+
             /** Make trial configuration current configuration */
             void trial_to_current();
 
@@ -70,6 +76,7 @@ namespace monomer {
 
         private:
             int m_index; // Unique monomer index
+            int m_conformer;
             CuboidPBC& m_space;
 
             vector<unique_ptr<Particle>> m_particles;

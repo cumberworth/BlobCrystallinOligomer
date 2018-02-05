@@ -134,6 +134,7 @@ namespace movetype {
 
     void NTDFlipMovemap::apply_movemap(Monomer& monomer) {
         monomer.rotate(m_point_in_plane, m_ref_mat);
+        monomer.flip_conformation();
     }
 
     MCMovetype::MCMovetype(Config& conf, Energy& ene, RandomGens& random_num,

@@ -44,7 +44,7 @@ namespace energy {
       */
     class Energy {
         public:
-            Energy(Config& conf, InputParams params);
+            Energy(Config& conf, InputParams& params);
             Energy(Config& conf, vector<PotentialData>,
                     vector<InteractionData>);
 
@@ -75,25 +75,33 @@ namespace energy {
             /** Check if particles within range to have non-zero pair potential */
             bool particles_interacting(
                     Particle& particle1,
+                    int conformer1,
                     CoorSet coorset1,
                     Particle& particle2,
+                    int conformer2,
                     CoorSet coorset2);
 
             /** Calculate pair energy between two particles.*/
             eneT calc_particle_pair_energy(
                     Particle& particle1,
+                    int conformer1,
                     CoorSet coorset1,
                     Particle& particle2,
+                    int conformer2,
                     CoorSet coorset2);
 
         private:
             Config& m_config;
             vector<unique_ptr<PairPotential>> m_potentials;
-            unordered_map<pair<int, int>, reference_wrapper<PairPotential>> m_pair_to_pot;
+            unordered_map<pair<int, int>, reference_wrapper<PairPotential>>
+                    m_same_pair_to_pot;
+            unordered_map<pair<int, int>, reference_wrapper<PairPotential>>
+                    m_different_pair_to_pot;
             distT m_max_cutoff;
 
             void create_potentials(vector<PotentialData> potentials,
-                    vector<InteractionData> interactions);
+                    vector<InteractionData> same_conformers_interactions,
+                    vector<InteractionData> different_conformers_interactions);
             bool monomers_in_range(
                     Monomer& monomer1,
                     CoorSet coorset1,

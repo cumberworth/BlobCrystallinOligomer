@@ -12,7 +12,7 @@ namespace config {
     using std::pair;
     using std::make_unique;
 
-    Config::Config(InputParams params, RandomGens& random_num):
+    Config::Config(InputParams& params, RandomGens& random_num):
             m_space_store {new CuboidPBC()},
             m_space {*m_space_store},
             m_random_num {random_num} {
