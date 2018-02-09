@@ -20,6 +20,7 @@ namespace particle {
     struct Orientation {
         vecT patch_norm {0, 0, 0};
         vecT patch_orient {0, 0, 0};
+        vecT patch_orient2 {0, 0, 0};
     };
 
     /** General class for particles, the basic building blocks of structures
@@ -79,6 +80,14 @@ namespace particle {
     class OrientedPatchyParticle: public PatchyParticle {
         public:
             OrientedPatchyParticle(int index, int type, vecT pos,
+                    Orientation ore, CuboidPBC& pbc_space);
+            void rotate(vecT& rot_c, rotMatT& rot_mat);
+    };
+
+    /** Particle class with one directional patch and two orientational patchs */
+    class DoubleOrientedPatchyParticle: public PatchyParticle {
+        public:
+            DoubleOrientedPatchyParticle(int index, int type, vecT pos,
                     Orientation ore, CuboidPBC& pbc_space);
             void rotate(vecT& rot_c, rotMatT& rot_mat);
     };

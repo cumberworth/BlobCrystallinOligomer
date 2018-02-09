@@ -5,6 +5,7 @@
 # Color scheme
 set colors(0) 10
 set colors(1) 11
+set colors(2) 12
 set colors(acd) 23
 set colors(ntd) 31
 

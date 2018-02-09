@@ -2,7 +2,7 @@
 
 source $libdir/libcrystallin.tcl
 
-set num_vecs 2
+set num_vecs 3
 
 set vecs_raw [load_matrix_as_lists $filebase.patch]
 set vecs [unpack_vecs $vecs_raw $num_vecs]

@@ -91,4 +91,15 @@ namespace particle {
         PatchyParticle::rotate(rot_c, rot_mat);
         m_trial_ore.patch_orient = rot_mat * m_ore.patch_orient;
     }
+
+    DoubleOrientedPatchyParticle::DoubleOrientedPatchyParticle(int index,
+            int type, vecT pos, Orientation ore, CuboidPBC& pbc_space):
+            PatchyParticle {index, type, pos, ore, pbc_space} {
+    }
+
+    void DoubleOrientedPatchyParticle::rotate(vecT& rot_c, rotMatT& rot_mat) {
+        PatchyParticle::rotate(rot_c, rot_mat);
+        m_trial_ore.patch_orient = rot_mat * m_ore.patch_orient;
+        m_trial_ore.patch_orient2 = rot_mat * m_ore.patch_orient2;
+    }
 }

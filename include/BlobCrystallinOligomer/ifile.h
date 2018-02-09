@@ -38,6 +38,7 @@ namespace ifile {
         vecT pos;
         vecT patch_norm;
         vecT patch_orient;
+        vecT patch_orient2;
     };
 
     /** For passing monomer data to the config class */

@@ -15,6 +15,7 @@ namespace energy {
     using potential::ShiftedLJPotential;
     using potential::PatchyPotential;
     using potential::OrientedPatchyPotential;
+    using potential::DoubleOrientedPatchyPotential;
     using shared_types::inf;
     using shared_types::InputError;
     using shared_types::vecT;
@@ -63,8 +64,8 @@ namespace energy {
         for (Particle& p1: particles1) {
             for (Particle& p2: particles2) {
                 eneT part_ene {calc_particle_pair_energy(p1,
-                        monomer1.get_conformer(), coorset1, p2,
-                        monomer2.get_conformer(), coorset2)};
+                        monomer1.get_conformer(coorset1), coorset1, p2,
+                        monomer2.get_conformer(coorset2), coorset2)};
                 if (part_ene == inf) {
                     return inf;
                 }
@@ -87,8 +88,8 @@ namespace energy {
         for (Particle& p1: particles1) {
             for (Particle& p2: particles2) {
                 bool p_interacting {particles_interacting(p1,
-                        monomer1.get_conformer(), coorset1, p2,
-                        monomer2.get_conformer(), coorset2)};
+                        monomer1.get_conformer(coorset1), coorset1, p2,
+                        monomer2.get_conformer(coorset2), coorset2)};
                 if (p_interacting) {
                     m_interacting = true;
                     return m_interacting;
@@ -218,6 +219,11 @@ namespace energy {
             else if (p_data.form == "OrientedPatchy") {
                 pot = new OrientedPatchyPotential {p_data.eps, p_data.sigl,
                         p_data.rcut, p_data.siga1, p_data.siga2,
+                        p_data.sigt};
+            }
+            else if (p_data.form == "DoubleOrientedPatchy") {
+                pot = new DoubleOrientedPatchyPotential {p_data.eps,
+                        p_data.sigl, p_data.rcut, p_data.siga1, p_data.siga2,
                         p_data.sigt};
             }
             m_potentials.emplace_back(pot);

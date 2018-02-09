@@ -128,9 +128,10 @@ def construct_monomers(acd_radius, ntd_radius, num_acd_spheres,
             # Note patch orientation is tied to the way the particles are later
             # oriented
             if j == 0:
-                particle = model.OrientedPatchyParticle(particle_i, 'ACD',
+                particle = model.DoubleOrientedPatchyParticle(particle_i, 'ACD',
                         ptype, patch_norm=np.array([0., -1., 0.]),
-                        patch_orient=np.array([1., 0., 0.]))
+                        patch_orient=np.array([1., 0., 0.]),
+                        patch_orient2=np.array([0., 0., 1.]))
             else:
                 particle = model.PatchyParticle(particle_i, 'ACD',
                         ptype, patch_norm=np.array([-1., 0., 0.]))
@@ -262,6 +263,7 @@ def construct_dimer(monomer1, monomer2):
 
     reflection = refls.rfnorm2aff([0, 1, 0])
     monomer2.apply_transformation(reflection)
+    monomer2.flip_conformer()
 
     return (monomer1, monomer2)
 

@@ -206,6 +206,9 @@ class AlphaBMonomer(Monomer):
     def conformer(self):
         return self._conformer
 
+    def flip_conformer(self):
+        _conformer *= -1
+
 
 class SimpleParticle:
     """Spherical particle.
@@ -291,6 +294,41 @@ class OrientedPatchyParticle(PatchyParticle):
         translation, rotation, zoom, shear = affines.decompose(M)
         transform = affines.compose(np.zeros(3), rotation, zoom, shear)[:3, :3]
         self._patch_orient = np.dot(transform, self._patch_orient)
+
+
+class DoubleOrientedPatchyParticle(PatchyParticle):
+    """Spherical particle with two orientationally specific patchs."""
+
+    def __init__(self, *args, patch_orient=None, patch_orient2, **kwargs):
+        super().__init__(*args, **kwargs)
+        if patch_orient is None: # Unit vector perpindicular to patch norm
+            self._patch_orient = np.array([0., 0., 0.])
+        else:
+            self._patch_orient = patch_orient
+
+        if patch_orient2 is None: # Unit vector perpindicular to patch norm
+            self._patch_orient2 = np.array([0., 0., 0.])
+        else:
+            self._patch_orient2 = patch_orient2
+
+        self._form = 'DoubleOrientedPatchyParticle' # Type form
+
+    @property
+    def patch_orient(self):
+        return self._patch_orient
+
+    @property
+    def patch_orient2(self):
+        return self._patch_orient2
+
+    def apply_transformation(self, M):
+        """Apply the transformation matrix to all position vectors."""
+
+        super().apply_transformation(M)
+        translation, rotation, zoom, shear = affines.decompose(M)
+        transform = affines.compose(np.zeros(3), rotation, zoom, shear)[:3, :3]
+        self._patch_orient = np.dot(transform, self._patch_orient)
+        self._patch_orient2 = np.dot(transform, self._patch_orient2)
 
 
 class PDBConfigOutputFile:
@@ -438,6 +476,9 @@ class JSONConfigOutputFile:
 
                 if 'Oriented' in particle.form:
                     particle_json['patch_orient'] = particle.patch_orient.tolist()[:3]
+
+                if 'DoubleOriented' in particle.form:
+                    particle_json['patch_orient2'] = particle.patch_orient2.tolist()[:3]
 
                 monomer_json['particles'].append(particle_json)
 

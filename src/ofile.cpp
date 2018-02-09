@@ -104,6 +104,9 @@ namespace ofile {
                 for (int i {0}; i != 3; i++) {
                     m_file << ore.patch_orient[i] << " ";
                 }
+                for (int i {0}; i != 3; i++) {
+                    m_file << ore.patch_orient2[i] << " ";
+                }
             }
         }
         m_file << "\n";

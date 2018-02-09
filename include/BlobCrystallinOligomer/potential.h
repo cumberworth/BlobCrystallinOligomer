@@ -16,6 +16,9 @@ namespace potential {
     /** Return value of Gaussian function */
     eneT guassian(distT theta, distT sig);
 
+    /** Return dihedral angle */
+    distT dihedral(vecT ore1, vecT ore2, vecT p_diff);
+
     /** Interface and shared implementation to pair potentials */
     class PairPotential {
         public:
@@ -108,6 +111,23 @@ namespace potential {
     class OrientedPatchyPotential: public PairPotential {
         public:
             OrientedPatchyPotential(eneT eps, distT sigl, distT rcut,
+                    distT siga1, distT siga2, distT sigt);
+            eneT calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
+                    Orientation& ore2);
+
+        private:
+            PatchyPotential m_patchy; // Unoriented-patchy potential
+            distT m_sigl;
+            distT m_sigt; // Orientation width
+    };
+
+    /** Oriented patch potential
+      *
+      * One more vector added to oriented patchy
+      */
+    class DoubleOrientedPatchyPotential: public PairPotential {
+        public:
+            DoubleOrientedPatchyPotential(eneT eps, distT sigl, distT rcut,
                     distT siga1, distT siga2, distT sigt);
             eneT calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
                     Orientation& ore2);

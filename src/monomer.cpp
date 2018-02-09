@@ -10,6 +10,7 @@ namespace monomer {
 
     using particle::Orientation;
     using particle::OrientedPatchyParticle;
+    using particle::DoubleOrientedPatchyParticle;
     using particle::PatchyParticle;
     using shared_types::CoorSet;
     using shared_types::distT;
@@ -35,8 +36,13 @@ namespace monomer {
         return m_index;
     }
 
-    int Monomer::get_conformer() {
-        return m_conformer;
+    int Monomer::get_conformer(CoorSet coorset) {
+        if (coorset == CoorSet::trial) {
+            return m_trial_conformer;
+        }
+        else {
+            return m_conformer;
+            }
     }
 
     Particle& Monomer::get_particle(int particle_index) {
@@ -83,10 +89,11 @@ namespace monomer {
     }
 
     void Monomer::flip_conformation() {
-        m_conformer *= -1;
+        m_trial_conformer *= -1;
     }
 
     void Monomer::current_to_trial() {
+        m_trial_conformer = m_conformer;
         for (size_t i {0}; i != m_particles.size(); i++) {
             Particle& particle {m_particle_refs[i].get()};
             particle.current_to_trial();
@@ -94,6 +101,7 @@ namespace monomer {
     }
 
     void Monomer::trial_to_current() {
+        m_conformer = m_trial_conformer;
         for (size_t i {0}; i != m_particles.size(); i++) {
             Particle& particle {m_particle_refs[i].get()};
             particle.trial_to_current();
@@ -120,6 +128,13 @@ namespace monomer {
                 ore.patch_norm = p_data.patch_norm;
                 ore.patch_orient = p_data.patch_orient;
                 part = new OrientedPatchyParticle {p_data.index, type,
+                        p_data.pos, ore, pbc_space};
+            }
+            else if (p_data.form == "DoubleOrientedPatchyParticle") {
+                ore.patch_norm = p_data.patch_norm;
+                ore.patch_orient = p_data.patch_orient;
+                ore.patch_orient2 = p_data.patch_orient2;
+                part = new DoubleOrientedPatchyParticle {p_data.index, type,
                         p_data.pos, ore, pbc_space};
             }
             else {

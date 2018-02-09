@@ -9,8 +9,11 @@
 
 namespace ifile {
 
-    using shared_types::CoorSet;
     using std::ifstream;
+    using std::cout;
+
+    using shared_types::CoorSet;
+    using shared_types::InputError;
 
     vecT json2vec(json jvec) {
         vector<distT> vec;
@@ -54,15 +57,21 @@ namespace ifile {
                 vecT pos {json2vec(json_particle["pos"])};
                 vecT patch_norm;
                 vecT patch_orient;
+                vecT patch_orient2;
                 if (p_form == "PatchyParticle" or p_form == 
-                        "OrientedPatchyParticle") {
+                        "OrientedPatchyParticle" or p_form ==
+                        "DoubleOrientedPatchyParticle") {
                     patch_norm = json2vec(json_particle["patch_norm"]);
                 }
-                if (p_form == "OrientedPatchyParticle") {
+                if (p_form == "OrientedPatchyParticle" or p_form ==
+                        "DoubleOrientedPatchyParticle") {
                     patch_orient = json2vec(json_particle["patch_orient"]);
                 }
+                if (p_form == "DoubleOrientedPatchyParticle") {
+                    patch_orient2 = json2vec(json_particle["patch_orient2"]);
+                }
                 ParticleData p_data {p_index, domain, p_form, p_type, pos, patch_norm,
-                    patch_orient};
+                    patch_orient, patch_orient2};
                 particles.push_back(p_data);
             }
             MonomerData m_data {monomer_index, conformer, particles};
@@ -96,32 +105,39 @@ namespace ifile {
             pot_data.index = json_potential["index"];
             string pot_form {json_potential["form"].get<string>()};
             pot_data.form = pot_form;
-            if (pot_form == "HardSphere") {
+            if (pot_form == "Zero") {
+            }
+            else if (pot_form == "HardSphere") {
                 pot_data.sigh = json_potential["parameters"]["sigh"];
             }
-            if (pot_form == "SquareWell") {
+            else if (pot_form == "SquareWell") {
                 pot_data.eps = json_potential["parameters"]["eps"];
                 pot_data.rcut = json_potential["parameters"]["rcut"];
             }
-            if (pot_form == "ShiftedLJ") {
+            else if (pot_form == "ShiftedLJ") {
                 pot_data.sigl = json_potential["parameters"]["sigl"];
                 pot_data.eps = json_potential["parameters"]["eps"];
                 pot_data.rcut = json_potential["parameters"]["rcut"];
             }
-            if (pot_form == "Patchy") {
+            else if (pot_form == "Patchy") {
                 pot_data.sigl = json_potential["parameters"]["sigl"];
                 pot_data.eps = json_potential["parameters"]["eps"];
                 pot_data.rcut = json_potential["parameters"]["rcut"];
                 pot_data.siga1 = json_potential["parameters"]["siga1"];
                 pot_data.siga2 = json_potential["parameters"]["siga2"];
             }
-            if (pot_form == "OrientedPatchy") {
+            else if (pot_form == "OrientedPatchy" or pot_form ==
+                        "DoubleOrientedPatchy") {
                 pot_data.sigl = json_potential["parameters"]["sigl"];
                 pot_data.eps = json_potential["parameters"]["eps"];
                 pot_data.rcut = json_potential["parameters"]["rcut"];
                 pot_data.siga1 = json_potential["parameters"]["siga1"];
                 pot_data.siga2 = json_potential["parameters"]["siga2"];
                 pot_data.sigt = json_potential["parameters"]["sigt"];
+            }
+            else {
+                cout << "No such potential\n";
+                throw InputError {};
             }
             m_potentials.push_back(pot_data);
         }

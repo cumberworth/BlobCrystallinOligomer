@@ -43,7 +43,7 @@ namespace monomer {
             int get_index();
 
             /** Conformer (two NTD configs) */
-            int get_conformer();
+            int get_conformer(CoorSet coorset);
 
             /** Get specified particle */
             Particle& get_particle(int particle_i);
@@ -76,6 +76,7 @@ namespace monomer {
 
         private:
             int m_index; // Unique monomer index
+            int m_trial_conformer;
             int m_conformer;
             CuboidPBC& m_space;
 
