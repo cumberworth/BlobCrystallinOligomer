@@ -18,6 +18,7 @@ namespace monomer {
 
     Monomer::Monomer(MonomerData m_data, CuboidPBC& pbc_space):
             m_index {m_data.index},
+            m_trial_conformer {m_data.conformer},
             m_conformer {m_data.conformer},
             m_space {pbc_space} {
 
