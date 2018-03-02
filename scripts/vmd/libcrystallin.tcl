@@ -8,6 +8,7 @@ set colors(1) 11
 set colors(2) 12
 set colors(acd) 23
 set colors(ntd) 31
+set colors(blob) 1
 
 proc load_matrix_as_lists {filename} {
     # Load a matrix as a list of lists
@@ -56,6 +57,10 @@ proc create_reps {} {
     mol addrep $system
     mol modselect 1 $system "type 2 3"
     mol modcolor 1 $system ColorID $colors(ntd)
+
+    mol addrep $system
+    mol modselect 2 $system "type 4"
+    mol modcolor 2 $system ColorID $colors(blob)
 }
 
 # Not sure how to pass arguments properly with callbacks, so just use globals

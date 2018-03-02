@@ -207,7 +207,7 @@ class AlphaBMonomer(Monomer):
         return self._conformer
 
     def flip_conformer(self):
-        _conformer *= -1
+        self._conformer *= -1
 
 
 class SimpleParticle:
