@@ -72,11 +72,50 @@ namespace potential {
             distT m_rcut;
     };
 
+    /** Harmonic well potential */
+    class HarmonicWellPotential:
+            public PairPotential {
+
+        public:
+            HarmonicWellPotential(eneT eps, distT rcut);
+            eneT calc_energy(
+                    distT rdist,
+                    vecT& p_diff,
+                    Orientation& ore1,
+                    Orientation& ore2);
+
+        private:
+            eneT m_eps;
+            distT m_rcut;
+            distT m_a; // steepness parameter
+    };
+
+    /** Harmonic well potential */
+    class AngularHarmonicWellPotential:
+            public PairPotential {
+
+        public:
+            AngularHarmonicWellPotential(eneT eps, distT rcut, distT siga);
+            eneT calc_energy(distT rdist, vecT&, Orientation&, Orientation&);
+
+        private:
+            HarmonicWellPotential m_hwell;
+            eneT m_eps;
+            distT m_rcut;
+            distT m_siga;
+    };
+
     /** Shifted Lennard Jone potential */
-    class ShiftedLJPotential: public PairPotential {
+    class ShiftedLJPotential:
+            public PairPotential {
+
         public:
             ShiftedLJPotential(eneT eps, distT sigl, distT rcut);
-            eneT calc_energy(distT rdist, vecT&, Orientation& ore1, Orientation& ore2);
+            eneT calc_energy(
+                    distT rdist,
+                    vecT&,
+                    Orientation& ore1,
+                    Orientation& ore2);
 
         private:
             eneT m_eps; // Well depth

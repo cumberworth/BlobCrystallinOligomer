@@ -60,7 +60,8 @@ namespace ifile {
                 vecT patch_orient2;
                 if (p_form == "PatchyParticle" or p_form == 
                         "OrientedPatchyParticle" or p_form ==
-                        "DoubleOrientedPatchyParticle") {
+                        "DoubleOrientedPatchyParticle" or p_form ==
+                        "AngularHarmonicWellPotential") {
                     patch_norm = json2vec(json_particle["patch_norm"]);
                 }
                 if (p_form == "OrientedPatchyParticle" or p_form ==
@@ -113,6 +114,15 @@ namespace ifile {
             else if (pot_form == "SquareWell") {
                 pot_data.eps = json_potential["parameters"]["eps"];
                 pot_data.rcut = json_potential["parameters"]["rcut"];
+            }
+            else if (pot_form == "HarmonicWell") {
+                pot_data.eps = json_potential["parameters"]["eps"];
+                pot_data.rcut = json_potential["parameters"]["rcut"];
+            }
+            else if (pot_form == "AngularHarmonicWell") {
+                pot_data.eps = json_potential["parameters"]["eps"];
+                pot_data.rcut = json_potential["parameters"]["rcut"];
+                pot_data.siga1 = json_potential["parameters"]["siga1"];
             }
             else if (pot_form == "ShiftedLJ") {
                 pot_data.sigl = json_potential["parameters"]["sigl"];

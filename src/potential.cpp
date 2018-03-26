@@ -63,7 +63,9 @@ namespace potential {
             PairPotential {sigh}, m_sigh {sigh} {
     }
 
-    eneT HardSpherePotential::calc_energy(distT rdist, vecT&, Orientation&, Orientation&) {
+    eneT HardSpherePotential::calc_energy(distT rdist, vecT&, Orientation&,
+            Orientation&) {
+
         eneT ene {0};
         if (rdist < m_sigh) {
             ene = inf;
@@ -76,11 +78,63 @@ namespace potential {
             PairPotential {rcut}, m_eps {eps}, m_rcut {rcut} {
     }
 
-    eneT SquareWellPotential::calc_energy(distT rdist, vecT&, Orientation&, Orientation&) {
+    eneT SquareWellPotential::calc_energy(distT rdist, vecT&, Orientation&,
+            Orientation&) {
+
         eneT ene {0};
         if (rdist < m_rcut) {
             ene = m_eps;
         }
+
+        return ene;
+    }
+
+    HarmonicWellPotential::HarmonicWellPotential(eneT eps,
+            distT rcut):
+            PairPotential {rcut},
+            m_eps {eps},
+            m_rcut {rcut} {
+
+        m_a = eps / pow(rcut, 2);
+    }
+
+    eneT HarmonicWellPotential::calc_energy(distT rdist, vecT&, Orientation&,
+            Orientation&) {
+
+        eneT ene {0};
+        if (rdist < m_rcut) {
+            ene = m_a * pow(rdist, 2) - m_eps;
+        }
+
+        return ene;
+    }
+
+    AngularHarmonicWellPotential::AngularHarmonicWellPotential(eneT eps,
+            distT rcut, distT siga):
+            PairPotential {rcut},
+            m_hwell {eps, rcut},
+            m_eps {eps},
+            m_rcut {rcut},
+            m_siga {siga} {
+    }
+
+    eneT AngularHarmonicWellPotential::calc_energy(distT rdist, vecT& p_diff,
+            Orientation& ore1, Orientation& ore2) {
+
+        eneT ene {m_hwell.calc_energy(rdist, p_diff, ore1, ore2)};
+        if (rdist < m_rcut or ene == 0) {
+            return ene;
+        }
+        distT dot {ore1.patch_norm.dot(ore2.patch_norm)};
+        // TODO fix this shit
+        if (dot > 1) {
+            dot = 1;
+        }
+        if (dot < -1) {
+            dot = -1;
+        }
+        distT theta {acos(dot)};
+        ene *= gaussian(theta, m_siga);
 
         return ene;
     }
@@ -110,14 +164,15 @@ namespace potential {
 
     PatchyPotential::PatchyPotential(double eps, double sigl, double rcut, 
             double siga1, double siga2):
-            PairPotential {rcut}, m_lj {eps, sigl, rcut},
+            PairPotential {rcut},
+            m_lj {eps, sigl, rcut},
             m_sigl {sigl},
             m_siga1 {siga1},
             m_siga2 {siga2} {
     }
 
-    eneT PatchyPotential::calc_energy(distT rdist, vecT& p_diff, Orientation& ore1,
-            Orientation& ore2) {
+    eneT PatchyPotential::calc_energy(distT rdist, vecT& p_diff,
+            Orientation& ore1, Orientation& ore2) {
 
         eneT ene {m_lj.calc_energy(rdist, p_diff, ore1, ore2)};
         if (rdist < m_sigl or ene == 0) {

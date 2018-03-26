@@ -12,6 +12,8 @@ namespace energy {
     using potential::ZeroPotential;
     using potential::HardSpherePotential;
     using potential::SquareWellPotential;
+    using potential::HarmonicWellPotential;
+    using potential::AngularHarmonicWellPotential;
     using potential::ShiftedLJPotential;
     using potential::PatchyPotential;
     using potential::OrientedPatchyPotential;
@@ -207,6 +209,12 @@ namespace energy {
             }
             if (p_data.form == "SquareWell") {
                 pot = new  SquareWellPotential {p_data.eps, p_data.rcut};
+            }
+            if (p_data.form == "HarmonicWell") {
+                pot = new HarmonicWellPotential {p_data.eps, p_data.rcut};
+            }
+            if (p_data.form == "AngularHarmonicWell") {
+                pot = new AngularHarmonicWellPotential {p_data.eps, p_data.rcut, p_data.siga1};
             }
             else if (p_data.form == "ShiftedLJ") {
                 pot = new ShiftedLJPotential {p_data.eps, p_data.sigl,
