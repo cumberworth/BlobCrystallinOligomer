@@ -171,7 +171,6 @@ namespace movetype {
 
     bool MetMCMovetype::move() {
         Monomer& m {m_config.get_random_monomer()};
-        vecT disp_v;
         m_movemap->generate_movemap(m);
         m_movemap->apply_movemap(m);
         eneT de {m_energy.calc_monomer_diff(m)};
@@ -239,6 +238,16 @@ namespace movetype {
             pair<int, int> cur_pair {pop_random_pair()};
             Monomer& monomer1 {m_config.get_monomer(cur_pair.first)};
             Monomer& monomer2 {m_config.get_monomer(cur_pair.second)};
+            bool mono_in_cluster {false};
+            for (auto mono_cluster: m_cluster) {
+                if (monomer2.get_index() == mono_cluster.get().get_index()) {
+                    mono_in_cluster = true;
+                    break;
+                }
+            }
+            if (mono_in_cluster) {
+                continue;
+            }
             eneT ene_1 {m_energy.calc_monomer_pair_energy(monomer1,
                     CoorSet::current, monomer2, CoorSet::current)};
             eneT ene_2 {m_energy.calc_monomer_pair_energy(monomer1,
@@ -283,7 +292,7 @@ namespace movetype {
 
     void VMMCMovetype::add_interacting_pairs(Monomer& monomer1) {
 
-        // Get all monomers that are interacting before and after application of movemap
+        // Get all monomers that are interacting before and after movemap
         monomerArrayT monomers {m_energy.get_interacting_monomers(monomer1,
                 CoorSet::current)};
         monomerArrayT trial_monomers {m_energy.get_interacting_monomers(monomer1,
@@ -291,13 +300,13 @@ namespace movetype {
         monomers.insert(monomers.end(), trial_monomers.begin(),
                 trial_monomers.end());
 
-        for (Monomer& mono: monomers) {
+        for (Monomer& mono_any: monomers) {
 
             // The second monomer should not already be in the cluster
-            int mono_i2 {mono.get_index()};
+            int mono_i2 {mono_any.get_index()};
             bool mono_in_cluster {false};
-            for (auto mono: m_cluster) {
-                if (mono_i2 == mono.get().get_index()) {
+            for (auto mono_cluster: m_cluster) {
+                if (mono_i2 == mono_cluster.get().get_index()) {
                     mono_in_cluster = true;
                     break;
                 }
@@ -317,7 +326,7 @@ namespace movetype {
             // Only apply the movemap once TODO only apply after prelink accepted
             bool movemap_applied {not m_interacting_mis.insert(mono_i2).second};
             if (not movemap_applied) {
-                m_movemap->apply_movemap(mono);
+                m_movemap->apply_movemap(mono_any);
             }
             m_pair_mis.insert(pair_mis);
         }

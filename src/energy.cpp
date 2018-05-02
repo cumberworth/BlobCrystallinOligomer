@@ -158,7 +158,8 @@ namespace energy {
             CoorSet coorset1, Particle& particle2, int conformer2,
             CoorSet coorset2) {
 
-        distT dist {m_config.calc_dist(particle1, coorset1, particle2, coorset2)};
+        distT dist {m_config.calc_dist(particle1, coorset1, particle2,
+                coorset2)};
         pair<int, int> key {particle1.get_type(), particle2.get_type()};
         PairPotential* pot;
         if (conformer1 == conformer2) {
@@ -180,7 +181,7 @@ namespace energy {
                 particle1, coorset1)};
         distT dist {diff.norm()};
         auto p1_ore {particle1.get_ore(coorset1)};
-        auto p2_ore {particle2.get_ore(coorset1)};
+        auto p2_ore {particle2.get_ore(coorset2)};
         pair<int, int> key {particle1.get_type(), particle2.get_type()};
 
         PairPotential* pot;
