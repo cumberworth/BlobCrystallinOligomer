@@ -181,10 +181,6 @@ namespace movetype {
         else {
             m.current_to_trial();
         }
-        if (m.get_particles()[0].get().get_ore(CoorSet::current).patch_norm.norm() > 1.01) {
-            cout << "what\n";
-        m_movemap->apply_movemap(m);
-        }
 
         return accepted;
     }

@@ -122,7 +122,7 @@ namespace potential {
             Orientation& ore1, Orientation& ore2) {
 
         eneT ene {m_hwell.calc_energy(rdist, p_diff, ore1, ore2)};
-        if (rdist < m_rcut or ene == 0) {
+        if (ene == 0) {
             return ene;
         }
         distT dot {ore1.patch_norm.dot(ore2.patch_norm)};
