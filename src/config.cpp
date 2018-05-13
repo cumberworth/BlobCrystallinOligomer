@@ -18,11 +18,11 @@ namespace config {
             m_random_num {random_num} {
 
         InputConfigFile config_file {params.m_config_filename};
-        vector<MonomerData> monomers {config_file.get_monomers()};
-        create_monomers(monomers);
         m_box_len = config_file.get_box_len();
         m_space.set_len(config_file.get_box_len());
         m_radius = config_file.get_radius();
+        vector<MonomerData> monomers {config_file.get_monomers()};
+        create_monomers(monomers);
 
         // Create monomer reference array
         for (auto &m: m_monomers) {
