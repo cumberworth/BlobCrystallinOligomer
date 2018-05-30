@@ -23,7 +23,7 @@ namespace space {
             /** Unwrapped given second vector relative to first
               *
               * Return the second vector that is closest to the first, where
-              * the second vector has possibly been wapped back inthe the unit
+              * the second vector has possibly been wrapped back in the the unit
               * cell.
               */
             vecT unwrap(vecT pos1, vecT pos2);
