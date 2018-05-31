@@ -83,9 +83,22 @@ namespace monomer {
     }
 
     void Monomer::rotate(vecT rot_c, rotMatT rot_mat) {
+        unwrap(rot_c);
         for (size_t i {0}; i != m_particles.size(); i++) {
             Particle& particle {m_particle_refs[i].get()};
             particle.rotate(rot_c, rot_mat);
+        }
+    }
+
+    void Monomer::unwrap(vecT ref_pos) {
+        vecT monomer_c {get_center(CoorSet::current)};
+        vecT unwrapped_monomer_c {m_space.unwrap(ref_pos, monomer_c)};
+        if (monomer_c != unwrapped_monomer_c) {
+            for (size_t i {0}; i != m_particles.size(); i++) {
+                Particle& particle {m_particle_refs[i].get()};
+                vecT& p_pos {particle.get_pos(CoorSet::trial)};
+                p_pos += unwrapped_monomer_c - monomer_c;
+            }
         }
     }
 

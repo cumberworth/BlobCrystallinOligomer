@@ -65,6 +65,9 @@ namespace monomer {
             /** Rotate monomer by given ? around given origin */
             void rotate(vecT rot_c, rotMatT rot_mat);
 
+            /** Unwrap monomer relative to reference position */
+            void unwrap(vecT ref_pos);
+
             /** Flip conformation */
             void flip_conformation();
 

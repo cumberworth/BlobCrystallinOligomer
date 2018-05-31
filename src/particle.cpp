@@ -55,10 +55,9 @@ namespace particle {
     }
 
     void Particle::rotate(vecT& rot_c, rotMatT& rot_mat) {
-        vecT unwrapped_pos {m_space.unwrap(rot_c, m_pos)};
-        m_trial_pos = unwrapped_pos - rot_c;
+        m_trial_pos -= rot_c;
         m_trial_pos = rot_mat * m_trial_pos;
-        m_trial_pos = m_trial_pos + rot_c;
+        m_trial_pos += rot_c;
         m_trial_pos = m_space.wrap(m_trial_pos);
     }
 
