@@ -40,8 +40,12 @@ namespace space {
 
     vecT CuboidPBC::wrap(vecT pos) {
         for (int i {0}; i != 3; i++) {
-            int box {static_cast<int>(pos[i] / m_r)};
-            pos[i] = -2*box*m_r + pos[i];
+            if (pos[i] > m_r) {
+                pos[i] = -2*m_r + pos[i];
+            }
+            else if (pos[i] < -m_r) {
+                pos[i] = 2*m_r + pos[i];
+            }
         }
 
         return pos;

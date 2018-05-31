@@ -91,13 +91,21 @@ namespace monomer {
     }
 
     void Monomer::unwrap(vecT ref_pos) {
-        vecT monomer_c {get_center(CoorSet::current)};
-        vecT unwrapped_monomer_c {m_space.unwrap(ref_pos, monomer_c)};
-        if (monomer_c != unwrapped_monomer_c) {
+        vecT center {0, 0, 0};
+        vecT& prev_pos {m_particle_refs[0].get().get_pos(CoorSet::trial)};
+        center += prev_pos;
+        for (size_t i {1}; i != m_particle_refs.size(); i++) {
+            vecT& pos {m_particle_refs[i].get().get_pos(CoorSet::trial)};
+            pos = m_space.unwrap(prev_pos, pos);
+            center += pos;
+        }
+        center /= m_particles.size();
+        vecT unwrapped_monomer_c {m_space.unwrap(ref_pos, center)};
+        if (center != unwrapped_monomer_c) {
             for (size_t i {0}; i != m_particles.size(); i++) {
                 Particle& particle {m_particle_refs[i].get()};
                 vecT& p_pos {particle.get_pos(CoorSet::trial)};
-                p_pos += unwrapped_monomer_c - monomer_c;
+                p_pos += unwrapped_monomer_c - center;
             }
         }
     }
