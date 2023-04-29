@@ -16,97 +16,99 @@
 
 namespace config {
 
-    using ifile::InputConfigFile;
-    using ifile::MonomerData;
-    using ifile::ParticleData;
-    using monomer::Monomer;
-    using param::InputParams;
-    using particle::Particle;
-    using random_gens::RandomGens;
-    using shared_types::distT;
-    using shared_types::CoorSet;
-    using shared_types::vecT;
-    using space::CuboidPBC;
-    using std::reference_wrapper;
-    using std::unique_ptr;
-    using std::vector;
+using ifile::InputConfigFile;
+using ifile::MonomerData;
+using ifile::ParticleData;
+using monomer::Monomer;
+using param::InputParams;
+using particle::Particle;
+using random_gens::RandomGens;
+using shared_types::CoorSet;
+using shared_types::distT;
+using shared_types::vecT;
+using space::CuboidPBC;
+using std::reference_wrapper;
+using std::unique_ptr;
+using std::vector;
 
-    typedef vector<reference_wrapper<Monomer>> monomerArrayT;
+typedef vector<reference_wrapper<Monomer>> monomerArrayT;
 
-    /** System configuration container
-      *
-      * Holds all monomer objects and provides an interface for configuration
-      * properties. Responsible for constructing monomers given monomer data.
-      */
-    class Config {
-        public:
-            Config(InputParams& params, RandomGens& random_num);
-            Config(vector<MonomerData> monomers, RandomGens& random_num,
-                    distT box_len, distT radius);
+/** System configuration container
+ *
+ * Holds all monomer objects and provides an interface for configuration
+ * properties. Responsible for constructing monomers given monomer data.
+ */
+class Config {
+  public:
+    Config(InputParams& params, RandomGens& random_num);
+    Config(vector<MonomerData> monomers,
+           RandomGens& random_num,
+           distT box_len,
+           distT radius);
 
-            Monomer& get_monomer(int monomer_index);
+    Monomer& get_monomer(int monomer_index);
 
-            /**  Draw monomer with uniform probability */
-            Monomer& get_random_monomer();
-            
-            /** Get all monomers in system */
-            monomerArrayT get_monomers();
+    /**  Draw monomer with uniform probability */
+    Monomer& get_random_monomer();
 
-            int get_num_particles();
+    /** Get all monomers in system */
+    monomerArrayT get_monomers();
 
-            int get_num_monomers();
+    int get_num_particles();
 
-            /** This assumes cuboid geometry */
-            distT get_box_len();
+    int get_num_monomers();
 
-            /** The radius of a single bead of a monomer
-              *
-              * Assumes only only bead size.
-              */
-            distT get_radius();
+    /** This assumes cuboid geometry */
+    distT get_box_len();
 
-            /** Calculate vector from particle 1 to particle 2 */
-            vecT calc_interparticle_vector(
-                    Particle& particle1,
-                    CoorSet coorset1,
-                    Particle& particle2,
-                    CoorSet coorset2);
+    /** The radius of a single bead of a monomer
+     *
+     * Assumes only only bead size.
+     */
+    distT get_radius();
 
-            /** Calculate distance between two particles */
-            distT calc_dist(
-                    Particle& particle1,
-                    CoorSet& coorset1,
-                    Particle& particle2,
-                    CoorSet& coorset2);
+    /** Calculate vector from particle 1 to particle 2 */
+    vecT calc_interparticle_vector(
+            Particle& particle1,
+            CoorSet coorset1,
+            Particle& particle2,
+            CoorSet coorset2);
 
-            /** Calculate distance between two monomers (centers) */
-            distT calc_dist(
-                    Monomer& monomer1,
-                    CoorSet& coorset1,
-                    Monomer& monomer2,
-                    CoorSet& coorset2);
+    /** Calculate distance between two particles */
+    distT calc_dist(
+            Particle& particle1,
+            CoorSet& coorset1,
+            Particle& particle2,
+            CoorSet& coorset2);
 
-            /** Update config positions only
-              *
-              * This method is to allow configurations to be read in from file
-              * and have the particle positions updated. The position vector
-              * must be in the order they would be written in. A plain vector
-              * is used for input instead of an eigen vector for ease of 
-              * compatibility with the cython analysis wrapper.
-              */
-            void update_config_positions(vector<vector<double>> positions);
+    /** Calculate distance between two monomers (centers) */
+    distT calc_dist(
+            Monomer& monomer1,
+            CoorSet& coorset1,
+            Monomer& monomer2,
+            CoorSet& coorset2);
 
-        private:
-            vector<unique_ptr<Monomer>> m_monomers;
-            monomerArrayT m_monomer_refs;
-            unique_ptr<CuboidPBC> m_space_store;
-            CuboidPBC& m_space;
-            RandomGens& m_random_num;
-            distT m_box_len;
-            distT m_radius;
+    /** Update config positions only
+     *
+     * This method is to allow configurations to be read in from file
+     * and have the particle positions updated. The position vector
+     * must be in the order they would be written in. A plain vector
+     * is used for input instead of an eigen vector for ease of
+     * compatibility with the cython analysis wrapper.
+     */
+    void update_config_positions(vector<vector<double>> positions);
 
-            void create_monomers(vector<MonomerData>);
-    };
-}
+  private:
+    vector<unique_ptr<Monomer>> m_monomers;
+    monomerArrayT m_monomer_refs;
+    unique_ptr<CuboidPBC> m_space_store;
+    CuboidPBC& m_space;
+    RandomGens& m_random_num;
+    distT m_box_len;
+    distT m_radius;
+
+    void create_monomers(vector<MonomerData>);
+};
+} // namespace config
 
 #endif // CONFIG_H

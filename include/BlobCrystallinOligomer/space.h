@@ -1,4 +1,4 @@
-// space.h 
+// space.h
 
 #ifndef SPACE_H
 #define SPACE_H
@@ -7,30 +7,30 @@
 
 namespace space {
 
-    using shared_types::distT;
-    using shared_types::vecT;
+using shared_types::distT;
+using shared_types::vecT;
 
-    class CuboidPBC {
-        public:
-            CuboidPBC();
-            CuboidPBC(distT len);
+class CuboidPBC {
+  public:
+    CuboidPBC();
+    CuboidPBC(distT len);
 
-            void set_len(distT len);
-            distT calc_dist(vecT& pos1, vecT& pos2);
-            vecT calc_diff(vecT& pos1, vecT& pos2);
-            vecT wrap(vecT pos);
-            
-            /** Unwrapped given second vector relative to first
-              *
-              * Return the second vector that is closest to the first, where
-              * the second vector has possibly been wrapped back in the the unit
-              * cell.
-              */
-            vecT unwrap(vecT pos1, vecT pos2);
+    void set_len(distT len);
+    distT calc_dist(vecT& pos1, vecT& pos2);
+    vecT calc_diff(vecT& pos1, vecT& pos2);
+    vecT wrap(vecT pos);
 
-        private:
-            distT m_r;
-    };
-}
+    /** Unwrapped given second vector relative to first
+     *
+     * Return the second vector that is closest to the first, where
+     * the second vector has possibly been wrapped back in the the unit
+     * cell.
+     */
+    vecT unwrap(vecT pos1, vecT pos2);
+
+  private:
+    distT m_r;
+};
+} // namespace space
 
 #endif // SPACE_H
