@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "catch/catch.hpp"
+#include "catch2/catch.hpp"
 
 #include "BlobCrystallinOligomer/config.h"
 #include "BlobCrystallinOligomer/ifile.h"
@@ -25,11 +25,14 @@ SCENARIO("Basic tests of configuration property calculation and access") {
     using std::vector;
     using std::unique_ptr;
 
+    //test
     GIVEN("System with two monomers of two simple particles in a box with PBC") {
         RandomGens random_num {};
         distT box_len {10};
         distT radius {1};
         vector<MonomerData> mds;
+        int conformer {0};
+        CoorSet coorset_current {CoorSet::current};
         for (int i {0}; i != 2; i++) {
             vector<ParticleData> pds;
             for (int j {0}; j != 2; j++) {
@@ -38,7 +41,7 @@ SCENARIO("Basic tests of configuration property calculation and access") {
                 ParticleData pd {j, "", "SimpleParticle", 0, pos, ore, ore};
                 pds.push_back(pd);
             }
-            MonomerData md {i, pds};
+            MonomerData md {i, conformer, pds};
             mds.push_back(md);
         }
         Config conf {mds, random_num, box_len, radius};
@@ -54,7 +57,7 @@ SCENARIO("Basic tests of configuration property calculation and access") {
         WHEN("Monomers are adjacent in middle of box") {
             THEN("Calculated distance is between those copies of the particles") {
                 distT e_dist {3};
-                distT c_dist {conf.calc_dist(p1, CoorSet::current, p2, CoorSet::current)};
+                distT c_dist {conf.calc_dist(p1, coorset_current, p2, coorset_current)};
                 REQUIRE(e_dist == c_dist);
             }
         }
@@ -65,7 +68,7 @@ SCENARIO("Basic tests of configuration property calculation and access") {
             m2.trial_to_current();
             THEN("Calculated distance follows the minimum image convention") {
                 distT e_dist {2};
-                distT c_dist {conf.calc_dist(p1, CoorSet::current, p2, CoorSet::current)};
+                distT c_dist {conf.calc_dist(p1, coorset_current, p2, coorset_current)};
                 REQUIRE(e_dist == c_dist);
             }
         }

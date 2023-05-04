@@ -38,6 +38,7 @@ vecT random_unit_vector(RandomGens& random_num) {
 }
 
 distT random_displacement(distT max_disp, RandomGens& random_num) {
+    // isn't this only giving between -max_disp/2 and max_disp/2?
     return max_disp * (random_num.uniform_real() - 0.5);
 }
 

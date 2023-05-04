@@ -4,26 +4,13 @@ Modeling tools for simulations of oligomers consisting of very-coarse-grained re
 
 ## Installation
 
-A Makefile is provided for compilation and installation.
-To install with the default settings run
-
-`make && make install`
-
-To set the installation directory, modify the `TARGETDIR` variable.
-To change the optimization level or add debug information (`g`), modify the OPTLEVEL variable.
-Boost is required by the program, specifically a version with the program options module.
-If you are need to install it locally on a cluster, follow the Makefile instructions in the comments to specify the locations of the headers and library; you will also need to modify the path variable:
-
-`export LD_LIBRARY_PATH=${BOOSTLIBRARYLOCATION}:$LD_LIBRARY_PATH`
-
-### Setting up on Aurora
-
-To compile on aurora, load the following modules
-
+The program requires the Boost library, specifically the program options module.
+Building and installation is done with CMake.
+To configure, build and install in `installdir`, run
 ```
-module load GCC/6.4.0-2.28
-module load OpenMPI/2.1.1
-module load Boost/1.65.1
+CXX=clang++ cmake -S . -B build -DCMAKE_INSTALL_PREFIX=[installdir] -DBUILD_TESTING=OFF
+cmake --build build
+cmake --install build
 ```
 
 ## Running simulations

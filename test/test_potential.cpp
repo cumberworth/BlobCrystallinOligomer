@@ -1,6 +1,6 @@
 // test_potential.cpp
 
-#include "catch/catch.hpp"
+#include "catch2/catch.hpp"
 
 #include "BlobCrystallinOligomer/particle.h"
 #include "BlobCrystallinOligomer/potential.h"

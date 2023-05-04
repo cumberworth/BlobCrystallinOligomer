@@ -79,13 +79,10 @@ add_executable(blobCrystallinOligomer apps/main.cpp)
 target_link_libraries(blobCrystallinOligomer PUBLIC BlobCrystallinOligomer_lib)
 
 # Testing
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-  include(CTest)
-endif()
-
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
-  add_subdirectory(tests)
-endif()
-
-# Install executable
-install(TARGETS blobCrystallinOligomer RUNTIME DESTINATION bin)
+find_package(Catch2 REQUIRED)
+add_executable(tests test/test_main.cpp test/test_config.cpp
+                     test/test_particle.cpp test/test_potential.cpp)
+target_link_libraries(tests BlobCrystallinOligomer_lib Catch2::Catch2)
+#include(CTest)
+#include(Catch)
+#catch_discover_tests(tests)

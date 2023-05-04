@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "catch/catch.hpp"
+#include "catch2/catch.hpp"
 
 #include "BlobCrystallinOligomer/particle.h"
 #include "BlobCrystallinOligomer/shared_types.h"
@@ -68,7 +68,6 @@ SCENARIO("Individual particles are moved in a box with PBC") {
             rmat << 0, -1, 0,
                     1,  0, 0,
                     0,  0, 1;
-            part.set_pos({0, 0, 0});
             part.rotate(crot, rmat);
             THEN("Trial position and orientation updated") {
                 vecT e_pos {2, 0, 0};
@@ -86,16 +85,17 @@ SCENARIO("Individual particles are moved in a box with PBC") {
                 REQUIRE(c_patch_orient == s_patch_orient);
             }
         }
-        WHEN("Rotated about a point outside") {
+        WHEN("Rotated to a point outside") {
             s_pos = {-4, 0, 0};
             vecT crot {4, 0, 0};
             rotMatT rmat;
 
-            // This is positive pi rotation in the z axis
+            // This is positive pi/2 rotation in the z axis
             rmat << 0, -1, 0,
                     1,  0, 0,
                     0,  0, 1;
             part.set_pos(s_pos);
+            part.current_to_trial();
             part.rotate(crot, rmat);
             THEN("Trial position and orientation updated") {
                 vecT e_pos {4, 2, 0};
