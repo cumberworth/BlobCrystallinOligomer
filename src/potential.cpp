@@ -9,7 +9,6 @@ namespace potential {
 
 using shared_types::inf;
 using std::acos;
-using std::cout;
 using std::exp;
 using std::pow;
 
