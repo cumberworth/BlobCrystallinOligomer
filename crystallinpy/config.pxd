@@ -6,3 +6,4 @@ cdef class Config:
     cdef RandomGens_c* random_gens_c
     cdef int num_monomers
     cpdef calc_dist_pairs(self, int particle_i)
+    cpdef check_monomer_integrity(self)

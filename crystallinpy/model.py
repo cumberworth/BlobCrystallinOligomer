@@ -100,6 +100,10 @@ class Monomer:
     def particles(self):
         return self._particles
 
+    @property
+    def conformer(self):
+        return self._conformer
+
     def apply_transformation(self, M):
         """Apply the transformation matrix to all position vectors."""
 
@@ -115,6 +119,7 @@ class SingleParticleMonomer(Monomer):
         self._radius = radius
         self._index = index
         self._num_particles = len(particles)
+        self._conformer = 0
 
         self._cur_i = -1 # For iterating over contained particles
 
@@ -201,10 +206,6 @@ class AlphaBMonomer(Monomer):
         center /= self._num_acd_particles
 
         return center
-
-    @property
-    def conformer(self):
-        return self._conformer
 
     def flip_conformer(self):
         self._conformer *= -1
@@ -401,40 +402,40 @@ class PDBConfigOutputFile:
                 }
                 line = self._atom_template.format(**atom_fields)
                 output_file.write(line + '\n')
-                if type(particle) in [PatchyParticle, OrientedPatchyParticle]:
-                    atom_fields = {
-                            'serial': particle.index,
-                            'name': 'PAT',
-                            'resName': 'ABC',
-                            #'chainID': string.ascii_uppercase[monomer.index],
-                            'chainID': 'A',
-                            'resSeq': monomer.index,
-                            'x': particle.pos[0] + particle.patch_norm[0],
-                            'y': particle.pos[1] + particle.patch_norm[1],
-                            'z': particle.pos[2] + particle.patch_norm[2],
-                            'occupancy': 1,
-                            #'tempFactor': '',
-                            'element': 'CG'
-                    }
-                    line = self._atom_template.format(**atom_fields)
-                    output_file.write(line + '\n')
-                if type(particle) is OrientedPatchyParticle:
-                    atom_fields = {
-                            'serial': particle.index,
-                            'name': 'PAT',
-                            'resName': 'ABC',
-                            #'chainID': string.ascii_uppercase[monomer.index],
-                            'chainID': 'A',
-                            'resSeq': monomer.index,
-                            'x': particle.pos[0] + particle.patch_orient[0],
-                            'y': particle.pos[1] + particle.patch_orient[1],
-                            'z': particle.pos[2] + particle.patch_orient[2],
-                            'occupancy': 1,
-                            #'tempFactor': '',
-                            'element': 'CG'
-                    }
-                    line = self._atom_template.format(**atom_fields)
-                    output_file.write(line + '\n')
+#                if type(particle) in [PatchyParticle, OrientedPatchyParticle]:
+#                    atom_fields = {
+#                            'serial': particle.index,
+#                            'name': 'PAT',
+#                            'resName': 'ABC',
+#                            #'chainID': string.ascii_uppercase[monomer.index],
+#                            'chainID': 'A',
+#                            'resSeq': monomer.index,
+#                            'x': particle.pos[0] + particle.patch_norm[0],
+#                            'y': particle.pos[1] + particle.patch_norm[1],
+#                            'z': particle.pos[2] + particle.patch_norm[2],
+#                            'occupancy': 1,
+#                            #'tempFactor': '',
+#                            'element': 'CG'
+#                    }
+#                    line = self._atom_template.format(**atom_fields)
+#                    output_file.write(line + '\n')
+#                if type(particle) is OrientedPatchyParticle:
+#                    atom_fields = {
+#                            'serial': particle.index,
+#                            'name': 'PAT',
+#                            'resName': 'ABC',
+#                            #'chainID': string.ascii_uppercase[monomer.index],
+#                            'chainID': 'A',
+#                            'resSeq': monomer.index,
+#                            'x': particle.pos[0] + particle.patch_orient[0],
+#                            'y': particle.pos[1] + particle.patch_orient[1],
+#                            'z': particle.pos[2] + particle.patch_orient[2],
+#                            'occupancy': 1,
+#                            #'tempFactor': '',
+#                            'element': 'CG'
+#                    }
+#                    line = self._atom_template.format(**atom_fields)
+#                    output_file.write(line + '\n')
 
         ter_fields = {
                 'serial': particle.index + 1,

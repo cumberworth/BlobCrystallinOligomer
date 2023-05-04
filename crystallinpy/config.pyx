@@ -63,7 +63,8 @@ cdef class Config:
         self.config_c.update_config_positions(positions_v)
 
     cpdef calc_dist_pairs(self, int particle_i):
-        cdef dists = np.zeros(self.num_monomers*(self.num_monomers - 1)/2, dtype=DTYPE)
+        cdef dists = np.zeros(self.num_monomers*(self.num_monomers - 1)/2,
+                 dtype=DTYPE)
         cdef int i, j, pair_i
         cdef Monomer_c* m1
         cdef Monomer_c* m2
@@ -85,3 +86,30 @@ cdef class Config:
                 pair_i += 1
 
         return dists
+
+    cpdef check_monomer_integrity(self):
+        cdef CoorSet cur = CoorSet.current
+        cdef distT radius = self.config_c.get_radius()
+        cdef int i
+        cdef distT dist, diff
+        for i in range(self.config_c.get_num_monomers()):
+            monomer = &self.config_c.get_monomer(i)
+            for j in range(monomer.get_num_particles() - 2):
+                p1 = &monomer.get_particle(j)
+                p2 = &monomer.get_particle(j + 1)
+                dist = self.config_c.calc_dist(p1[0], cur, p2[0], cur)
+                diff = abs(2*radius - dist)
+                if diff > 0.01:
+                    print(dist)
+                    return False
+
+            # The pseudoparticle has a different radius
+            p1 = &monomer.get_particle(j + 1)
+            p2 = &monomer.get_particle(j + 2)
+            dist = self.config_c.calc_dist(p1[0], cur, p2[0], cur)
+            diff = abs(2.5*radius - dist)
+            if diff > 0.01:
+                print(dist)
+                return False
+
+        return True

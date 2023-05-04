@@ -40,3 +40,17 @@ def calc_interface_timeseries(Config config, VTFInputFile trajfile):
         ntd_interfaces.append(np.sum(interacts4))
 
     return primary_interfaces, secondary_interfaces, ntd_interfaces
+
+def check_monomer_integrity(Config config, VTFInputFile trajfile):
+    """Check monomers have not changed their internal distances"""
+    cdef int i
+    cdef int num_configs = trajfile.num_configs
+    intact = True
+    for i in range(num_configs - 1):
+        positions = trajfile.get_config_positions(i)
+        config.update_config_positions(positions)
+        if not config.check_monomer_integrity():
+            intact = False
+            print('Broken monomer found at configuration {}'.format(i))
+
+    return intact

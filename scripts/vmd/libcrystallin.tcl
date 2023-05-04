@@ -70,10 +70,31 @@ proc draw_3d_vector {origin vector color} {
     # Draw vector from origin
     global system
     graphics $system color $color
+    # REMOVE BELOW FOR ALPHAB SCALE
+    #set vector [vecscale 0.1 $vector]
     set end [vecadd $origin $vector]
     set middle [vecadd $origin [vecscale 0.8 [vecsub $end $origin]]]
-    graphics $system cylinder $origin $middle radius 1.0 resolution 10
-    graphics $system cone $middle $end radius 3.0 resolution 10
+    graphics $system cylinder $origin $middle radius 1.0 resolution 50
+    graphics $system cone $middle $end radius 3.0 resolution 50
+    #graphics $system cylinder $origin $middle radius 0.1 resolution 50
+    #graphics $system cone $middle $end radius 0.3 resolution 50
+}
+
+proc draw_selected_patch_vectors {vecs num_vecs particles} {
+    # Draw patch vectors for current frame
+    # Must clear previous first
+    global system
+    global colors
+    set frame [molinfo $system get frame]
+    foreach i $particles {
+        set d [atomselect $system "index $i" frame $frame]
+        set d_coors [lindex [$d get {x y z}] 0]
+        for {set j 0} {$j != $num_vecs} {incr j} {
+            set d_vec [lindex [lindex [lindex $vecs $frame] $i] $j]
+            set vector [vecscale $d_vec 10.8]
+            draw_3d_vector $d_coors $vector $colors($j)
+        }
+    }
 }
 
 proc draw_patch_vectors {vecs num_vecs} {
